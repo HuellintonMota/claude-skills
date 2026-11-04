@@ -8,6 +8,9 @@
 #                               skill claude-skills-atualizar, que roda sem terminal interativo)
 set -e
 
+# Sempre instalada, sem aparecer na escolha: é por ela que as outras se atualizam.
+SEMPRE="claude-skills-atualizar"
+
 RAIZ="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 DESTINO="${CLAUDE_SKILLS_DIR:-$HOME/.claude/skills}"
 mkdir -p "$DESTINO"
@@ -30,7 +33,8 @@ done
 
 nomes=()
 for pasta in "$RAIZ"/skills/*/; do
-  [ -f "$pasta/SKILL.md" ] && nomes+=("$(basename "$pasta")")
+  nome="$(basename "$pasta")"
+  [ -f "$pasta/SKILL.md" ] && [ "$nome" != "$SEMPRE" ] && nomes+=("$nome")
 done
 
 descricao() {
@@ -102,7 +106,9 @@ case "$modo" in
 esac
 
 echo "Skills em $DESTINO:"
+ligar "$SEMPRE"
 for n in "${escolhidas[@]}"; do
+  [ "$n" = "$SEMPRE" ] && continue
   if [ -f "$RAIZ/skills/$n/SKILL.md" ]; then ligar "$n"; else echo "  não existe skill \"$n\""; fi
 done
 if [ "$modo" = atualizar ] && [ ${#novas[@]} -gt 0 ]; then

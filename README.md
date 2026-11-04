@@ -4,7 +4,7 @@ Skills para o Claude Code.
 
 | Skill | Para quê |
 |---|---|
-| [`claude-skills-atualizar`](skills/claude-skills-atualizar/SKILL.md) | Atualiza este repositório (pull + setup). |
+| [`claude-skills-atualizar`](skills/claude-skills-atualizar/SKILL.md) | Atualiza este repositório (pull + setup). Instalada sempre, sem aparecer na escolha. |
 | [`orquestrador`](skills/orquestrador/SKILL.md) | Orquestra cards do Jira (projeto PI) entre os agentes dos projetos no canvas Maestri. Pede a URL do webhook do Discord na instalação (fica em `~/.claude/orquestrador.env`, fora do git). |
 | [`video-explicativo`](skills/video-explicativo/SKILL.md) | Vídeo explicativo de funcionalidade (Remotion + capturas + narração neural pt-BR + legenda), ou dublar um vídeo que só tem legenda. |
 
