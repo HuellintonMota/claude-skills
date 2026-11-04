@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+# Registra no Claude Code cada skill de skills/ como um link para este checkout.
+# Rodar de novo depois de um `git pull` (é o que a skill claude-skills-atualizar faz).
+set -e
+
+RAIZ="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+DESTINO="${CLAUDE_SKILLS_DIR:-$HOME/.claude/skills}"
+mkdir -p "$DESTINO"
+
+windows=false
+case "${OSTYPE:-}" in msys*|cygwin*) windows=true ;; esac
+
+ligar() {
+  local origem="$1" link="$2"
+  if [ -L "$link" ]; then
+    rm -f "$link"
+  elif [ -e "$link" ]; then
+    echo "  pulei $(basename "$link"): já existe uma skill com esse nome que não veio daqui"
+    return
+  fi
+  if $windows; then
+    # Junction não exige modo de desenvolvedor nem administrador, ao contrário do symlink do Windows.
+    powershell -NoProfile -Command "New-Item -ItemType Junction -Path '$(cygpath -w "$link")' -Target '$(cygpath -w "$origem")' | Out-Null"
+  else
+    ln -s "$origem" "$link"
+  fi
+  echo "  $(basename "$link")"
+}
+
+echo "Skills em $DESTINO:"
+for pasta in "$RAIZ"/skills/*/; do
+  [ -f "$pasta/SKILL.md" ] || continue
+  ligar "${pasta%/}" "$DESTINO/$(basename "$pasta")"
+done
+echo "Pronto. Abra uma sessão nova do Claude Code para ele carregar as skills."
