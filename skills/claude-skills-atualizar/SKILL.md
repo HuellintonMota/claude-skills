@@ -11,8 +11,11 @@ description: Atualiza as skills do repositório HuellintonMota/claude-skills (gi
 3. Guarde `git -C <checkout> rev-parse --short HEAD`, rode `git -C <checkout> pull --ff-only` e depois
    `bash <checkout>/setup --atualizar` (religa as instaladas; o setup interativo não funciona aqui,
    porque o Bash do Claude Code não tem terminal).
-4. Mostre o que mudou: `git -C <checkout> log --oneline <antes>..HEAD`. Se nada mudou, diga que já
+4. Repasse a conferência de dependências que o setup imprime: itens com ✗ são o que falta, com o
+   comando para resolver. Programa do sistema só se instala com o "sim" da pessoa
+   (`bash <checkout>/setup --skills <nome> --sim`).
+5. Mostre o que mudou: `git -C <checkout> log --oneline <antes>..HEAD`. Se nada mudou, diga que já
    estava na última versão.
-5. Se o setup listar skills novas não instaladas, mostre-as e pergunte quais instalar; instale com
+6. Se o setup listar skills novas não instaladas, mostre-as e pergunte quais instalar; instale com
    `bash <checkout>/setup --skills a,b`.
-6. Lembre que skills novas só aparecem numa sessão nova do Claude Code.
+7. Lembre que skills novas só aparecem numa sessão nova do Claude Code.

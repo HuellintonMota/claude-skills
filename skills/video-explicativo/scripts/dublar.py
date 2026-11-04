@@ -7,7 +7,7 @@ Uso:
 
 Sem --legenda, procura um .srt com o mesmo nome do vídeo e, se não houver, a primeira faixa de legenda
 embutida. Legenda só queimada na imagem não é lida aqui: monte o .srt antes (references/dublagem.md).
-Requer: pip install edge-tts; ffmpeg no PATH, em $FFMPEG ou em --ffmpeg.
+Requer edge-tts e ffmpeg: o setup do repositório instala os dois no .venv da skill (imageio-ffmpeg).
 """
 import argparse
 import asyncio
@@ -85,8 +85,12 @@ def achar_ffmpeg(indicado: str | None) -> str:
     for candidato in (indicado, os.environ.get("FFMPEG"), shutil.which("ffmpeg")):
         if candidato and (Path(candidato).exists() or shutil.which(candidato)):
             return candidato
-    sys.exit("ffmpeg não encontrado. Use --ffmpeg, a variável FFMPEG, `npm i ffmpeg-static` "
-             "(node_modules/ffmpeg-static/ffmpeg.exe) ou `winget install Gyan.FFmpeg`.")
+    try:
+        import imageio_ffmpeg
+        return imageio_ffmpeg.get_ffmpeg_exe()
+    except (ImportError, RuntimeError):
+        sys.exit("ffmpeg não encontrado. Rode o setup do repositório (instala o imageio-ffmpeg no venv da "
+                 "skill), ou use --ffmpeg ou a variável FFMPEG.")
 
 
 def sondar(ffmpeg: str, video: Path) -> tuple[float, bool, bool]:

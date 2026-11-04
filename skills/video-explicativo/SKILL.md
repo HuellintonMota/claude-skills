@@ -17,12 +17,13 @@ está em `exemplo-enps/` (código, roteiro e plano; sem áudios, capturas e node
 
 Trabalhe numa pasta própria do vídeo (ex.: `videos/<nome>`), **nunca dentro do repositório do sistema**.
 
-```bash
-python -m venv .venv && .venv/Scripts/pip install edge-tts   # Linux/macOS: .venv/bin/pip
-```
+O `setup` do repositório cria o `.venv` **da skill** com edge-tts e ffmpeg (imageio-ffmpeg). Use esse
+Python nos comandos abaixo; chamado aqui de `$PY`:
+- Windows: `<pasta desta skill>/.venv/Scripts/python.exe`
+- Linux/macOS: `<pasta desta skill>/.venv/bin/python`
 
-ffmpeg: use o do PATH ou instale `ffmpeg-static` com npm (no modo completo ele já vem com o projeto
-Remotion: `remotion/node_modules/ffmpeg-static/ffmpeg.exe`). O edge-tts precisa de internet.
+Se ele não existir, rode `bash ~/.claude/claude-skills/setup --skills video-explicativo`. O edge-tts
+precisa de internet. O modo completo precisa também de Node 22.18+ (o setup confere).
 
 ## Modo só dublagem
 
@@ -32,7 +33,7 @@ Remotion: `remotion/node_modules/ffmpeg-static/ffmpeg.exe`). O edge-tts precisa 
 2. **Amostra de voz.** Gere a frase da primeira fala em 2–3 vozes e deixe a pessoa escolher
    (padrão: `pt-BR-ThalitaMultilingualNeural`; alternativas na referência).
 3. **Relatório antes do vídeo:**
-   `.venv/Scripts/python scripts/dublar.py VIDEO.mp4 --so-relatorio [--legenda X.srt] [--voz ...]`
+   `$PY <pasta desta skill>/scripts/dublar.py VIDEO.mp4 --so-relatorio [--legenda X.srt] [--voz ...]`
    Mostra cada fala, o tempo de voz contra o espaço que ela tem, as que foram aceleradas e as que
    atrasaram. Mais de 3 falas aceleradas acima de 15% ou atrasos acumulando: a legenda tem texto demais
    para o tempo; avise a pessoa antes de seguir (encurtar o texto da fala no .srt resolve).
@@ -58,7 +59,7 @@ acelera a voz no máximo 30% quando a fala não cabe e, se ainda assim não coub
    - `remotion/src/linhaDoTempo.ts`: `CORTES` e `PAUSA_DEPOIS`;
    - `remotion/src/cenasAnimadas.tsx` / `cenasCaptura.tsx` e o mapa `CENAS` em `Raiz.tsx`;
    - logos em `remotion/public/`; nomes dos arquivos de saída em `package.json` e `scripts/gerar-srt.ts`.
-5. **Narração:** `.venv/Scripts/python scripts/gerar_narracao.py [cena ...]` → áudio por cena em
+5. **Narração:** `$PY scripts/gerar_narracao.py [cena ...]` → áudio por cena em
    `remotion/public/audio/` e tempo de cada palavra em `remotion/src/tempos.json`. A duração das cenas
    e a legenda saem desse arquivo.
 6. **Capturas** do ambiente de **dev**, nunca de produção: `scripts/capturar.sh NOME '{"alvo":[x,y,w,h]}'`

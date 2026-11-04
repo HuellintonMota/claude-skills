@@ -32,5 +32,12 @@ git -C ~/.claude/claude-skills pull --ff-only && bash ~/.claude/claude-skills/se
 
 Como as skills são links para o checkout, o `pull` já atualiza as que existem; o `setup --atualizar` religa as instaladas e lista as novas.
 
-Requisitos: Python 3 com `edge-tts` (internet para gerar a voz), Node 20+ para o modo completo, ffmpeg
-(o projeto Remotion já traz o `ffmpeg-static`).
+## Dependências
+
+O `setup` confere o que cada skill precisa (`skills/<nome>/dependencias.sh`) depois de ligá-la:
+- o que fica dentro da pasta da skill (ex.: o `.venv` do vídeo, com edge-tts e ffmpeg) instala sozinho;
+- programas do sistema que faltam (Python, Node, gh, git) ele oferece instalar com winget, brew ou apt,
+  perguntando antes; `--sim` instala sem perguntar e `--sem-dependencias` pula a conferência;
+- o que não dá para instalar daqui (app Maestri, `gh auth login`, conector do Jira) ele só aponta.
+
+Sem terminal interativo (ex.: rodado pelo Claude), ele só lista o que falta.

@@ -6,6 +6,11 @@
 #      ./setup --skills a,b     instala só essas, sem perguntar
 #      ./setup --atualizar      religa as que já estão instaladas e só lista as novas (usado pela
 #                               skill claude-skills-atualizar, que roda sem terminal interativo)
+#      --sim                    instala dependências do sistema que faltarem sem perguntar
+#      --sem-dependencias       não confere dependências
+#
+# Cada skill pode ter um dependencias.sh: confere o que ela precisa, instala sozinho o que fica dentro
+# da pasta da skill (ex.: .venv) e pergunta antes de instalar programas no sistema.
 set -e
 
 # Sempre instalada, sem aparecer na escolha: é por ela que as outras se atualizam.
@@ -20,12 +25,16 @@ case "${OSTYPE:-}" in msys*|cygwin*) windows=true ;; esac
 
 modo=perguntar
 pedidas=""
+dependencias=true
+DEP_MODO=perguntar
 while [ $# -gt 0 ]; do
   case "$1" in
     --todas) modo=todas ;;
     --skills) modo=lista; pedidas="$2"; shift ;;
     --atualizar) modo=atualizar ;;
-    -h|--help) sed -n '2,9p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+    --sim) DEP_MODO=sim ;;
+    --sem-dependencias) dependencias=false ;;
+    -h|--help) sed -n '2,14p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
     *) echo "Opção desconhecida: $1" >&2; exit 1 ;;
   esac
   shift
@@ -111,6 +120,24 @@ for n in "${escolhidas[@]}"; do
   [ "$n" = "$SEMPRE" ] && continue
   if [ -f "$RAIZ/skills/$n/SKILL.md" ]; then ligar "$n"; else echo "  não existe skill \"$n\""; fi
 done
+if $dependencias; then
+  [ -t 0 ] || [ "$DEP_MODO" = sim ] || DEP_MODO=nao
+  # shellcheck source=lib/dependencias.sh
+  . "$RAIZ/lib/dependencias.sh"
+  echo "Dependências:"
+  for n in "$SEMPRE" "${escolhidas[@]}"; do
+    script="$RAIZ/skills/$n/dependencias.sh"
+    [ -f "$script" ] && ligada_aqui "$n" || continue
+    echo "  $n"
+    SKILL_DIR="$RAIZ/skills/$n"
+    . "$script"
+  done
+  if [ "$DEP_PENDENTES" -gt 0 ]; then
+    echo "Faltam $DEP_PENDENTES dependência(s) (✗ acima). Resolva e rode o setup de novo para conferir."
+  else
+    echo "  tudo certo"
+  fi
+fi
 if [ "$modo" = atualizar ] && [ ${#novas[@]} -gt 0 ]; then
   echo "Não instaladas (para instalar: bash $RAIZ/setup --skills <nome>):"
   for n in "${novas[@]}"; do echo "  $n — $(descricao "$n")"; done
