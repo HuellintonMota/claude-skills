@@ -149,11 +149,29 @@ def legenda_do_video(args, ffmpeg: str, video: Path, tem_legenda_embutida: bool,
              "primeiro (references/dublagem.md).")
 
 
+def so_letras(texto: str) -> str:
+    return "".join(ch for ch in texto.lower() if ch.isalnum())
+
+
 async def sintetizar(texto: str, voz: str, acelerar: int, mp3: Path) -> None:
     taxa = f"+{acelerar}%" if acelerar else "+0%"
-    await edge_tts.Communicate(texto, voz, rate=taxa).save(str(mp3))
-    if not mp3.exists() or mp3.stat().st_size == 0:
-        raise RuntimeError(f"edge-tts não devolveu áudio para: {texto[:60]}")
+    ultima = so_letras(texto.split()[-1])
+    for tentativa in range(1, 4):
+        audio = bytearray()
+        palavras = []
+        async for parte in edge_tts.Communicate(texto, voz, rate=taxa, boundary="WordBoundary").stream():
+            if parte["type"] == "audio":
+                audio.extend(parte["data"])
+            elif parte["type"] == "WordBoundary":
+                palavras.append(parte)
+        # O edge-tts às vezes fecha o stream no meio da frase sem erro: o mp3 sai curto e a última
+        # palavra some. O mp3 dele é de 48 kbit/s, então o tamanho dá a duração.
+        fim = (palavras[-1]["offset"] + palavras[-1]["duration"]) / 1e7 if palavras else 0
+        if palavras and so_letras(palavras[-1]["text"]) == ultima and len(audio) * 8 / 48000 >= fim:
+            mp3.write_bytes(bytes(audio))
+            return
+        print(f"aviso: áudio incompleto, tentativa {tentativa}/3: {texto[:50]}")
+    raise RuntimeError(f"edge-tts devolveu áudio incompleto três vezes para: {texto[:60]}")
 
 
 def decodificar(ffmpeg: str, mp3: Path) -> array:

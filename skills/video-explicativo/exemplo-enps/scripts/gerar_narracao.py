@@ -28,8 +28,12 @@ def texto_falado(cena: dict) -> str:
     return texto
 
 
-async def gerar(cena: dict) -> dict:
-    comunicador = edge_tts.Communicate(texto_falado(cena), ROTEIRO["voz"], boundary="WordBoundary")
+def so_letras(texto: str) -> str:
+    return "".join(ch for ch in texto.lower() if ch.isalnum())
+
+
+async def falar(texto: str) -> tuple[bytes, list[dict]]:
+    comunicador = edge_tts.Communicate(texto, ROTEIRO["voz"], boundary="WordBoundary")
     palavras = []
     audio = bytearray()
     async for parte in comunicador.stream():
@@ -37,10 +41,24 @@ async def gerar(cena: dict) -> dict:
             audio.extend(parte["data"])
         elif parte["type"] == "WordBoundary":
             palavras.append({"texto": parte["text"], "inicio": parte["offset"] / 1e7, "fim": (parte["offset"] + parte["duration"]) / 1e7})
-    if not audio:
-        raise RuntimeError(f"edge-tts não devolveu áudio para {cena['id']}")
-    (SAIDA / f"{cena['id']}.mp3").write_bytes(bytes(audio))
-    return {"id": cena["id"], "palavras": palavras}
+    return bytes(audio), palavras
+
+
+async def gerar(cena: dict) -> dict:
+    texto = texto_falado(cena)
+    ultima = so_letras(texto.split()[-1])
+    for tentativa in range(1, 4):
+        audio, palavras = await falar(texto)
+        # O edge-tts às vezes fecha o stream no meio da frase sem erro: o mp3 sai curto e a última
+        # palavra some. O mp3 dele é de 48 kbit/s, então o tamanho dá a duração.
+        duracao = len(audio) * 8 / 48000
+        completo = palavras and so_letras(palavras[-1]["texto"]) == ultima and duracao >= palavras[-1]["fim"]
+        if completo:
+            (SAIDA / f"{cena['id']}.mp3").write_bytes(audio)
+            return {"id": cena["id"], "palavras": palavras}
+        fim = palavras[-1]["texto"] if palavras else "nada"
+        print(f"aviso {cena['id']}: áudio incompleto ({duracao:.2f}s, terminou em '{fim}'), tentativa {tentativa}/3")
+    raise RuntimeError(f"edge-tts devolveu áudio incompleto para {cena['id']} três vezes")
 
 
 async def main() -> None:
