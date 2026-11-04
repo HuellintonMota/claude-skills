@@ -1,0 +1,8 @@
+node_modules/
+.venv/
+__pycache__/
+*.mp3
+*.mp4
+*.wav
+skills/*/exemplo-enps/remotion/public/audio/
+skills/*/exemplo-enps/remotion/public/capturas/

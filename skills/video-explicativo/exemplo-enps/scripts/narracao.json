@@ -1,0 +1,42 @@
+{
+  "voz": "pt-BR-ThalitaMultilingualNeural",
+  "cenas": [
+    {
+      "id": "c1",
+      "legenda": "Em uma pergunta, o eNPS mede o quanto você recomendaria a empresa como um bom lugar para trabalhar. Veja como ele funciona no Conecta."
+    },
+    {
+      "id": "c2",
+      "legenda": "A pergunta é sempre a mesma ideia: em uma escala de 0 a 10, o quanto você recomendaria a Bruning como um bom lugar para trabalhar? Você escolhe uma nota e, se quiser, deixa um comentário."
+    },
+    {
+      "id": "c3",
+      "legenda": "Quando o RH abre uma rodada, ela aparece na sua tela de Início, em Pesquisas pendentes. É só clicar."
+    },
+    {
+      "id": "c4",
+      "legenda": "Toque na nota, escreva um comentário se quiser, e envie. Cada pessoa responde uma vez por rodada."
+    },
+    {
+      "id": "c5",
+      "legenda": "Sua resposta é anônima. O Conecta registra que você participou, mas a nota não fica ligada ao seu nome. Com menos de cinco respostas, ninguém vê o resultado, e grupos muito pequenos ficam ocultos. Só evite citar nomes no comentário."
+    },
+    {
+      "id": "c6",
+      "legenda": "Notas 9 e 10 são promotores. Notas 7 e 8 são neutros. E as notas de 0 a 6 são detratores. O eNPS é o percentual de promotores menos o percentual de detratores, e vai de menos 100 a mais 100. Por exemplo: 60% de promotores e 15% de detratores dão um eNPS de 45."
+    },
+    {
+      "id": "c7",
+      "legenda": "Para o RH: em Pesquisas, crie uma pesquisa do tipo eNPS e adicione uma pergunta NPS. Use só uma pergunta NPS por pesquisa. Deixe a opção Anônima ligada, defina o início e o fim, e abra a pesquisa. Na próxima rodada, use Duplicar."
+    },
+    {
+      "id": "c8",
+      "legenda": "No resultado, você vê a participação, os três grupos, o eNPS e os comentários, e pode filtrar por um recorte de cada vez. Em Indicadores, na aba Clima, o eNPS aparece por trimestre, comparado com a meta de 70. Gestores também veem esse indicador da empresa."
+    },
+    {
+      "id": "c9",
+      "legenda": "Sua nota sincera é o que faz esse número valer. Quando a pesquisa aparecer no seu Início, responda."
+    }
+  ],
+  "pronuncia": {}
+}

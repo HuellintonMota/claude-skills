@@ -1,0 +1,176 @@
+{
+  "cadastro": {
+    "arquivo": "cadastro.png",
+    "largura": 1920,
+    "altura": 1072,
+    "alvos": {
+      "tipo": [
+        1010,
+        150,
+        560,
+        80
+      ],
+      "periodo": [
+        136,
+        236,
+        874,
+        78
+      ],
+      "pergunta": [
+        136,
+        516,
+        1440,
+        210
+      ],
+      "abrir": [
+        350,
+        1026,
+        166,
+        48
+      ]
+    }
+  },
+  "lista": {
+    "arquivo": "lista.png",
+    "largura": 1920,
+    "altura": 1072,
+    "alvos": {
+      "lista": [
+        143,
+        220,
+        1734,
+        282
+      ],
+      "duplicar": [
+        1786,
+        264,
+        80,
+        38
+      ],
+      "nova": [
+        118,
+        1022,
+        170,
+        40
+      ]
+    }
+  },
+  "resultado": {
+    "arquivo": "resultado.png",
+    "largura": 1920,
+    "altura": 1072,
+    "alvos": {
+      "participacao": [
+        490,
+        133,
+        1040,
+        94
+      ],
+      "recorte": [
+        490,
+        244,
+        1040,
+        95
+      ],
+      "grupos": [
+        500,
+        460,
+        430,
+        360
+      ],
+      "nps": [
+        498,
+        770,
+        190,
+        50
+      ],
+      "comentarios": [
+        928,
+        460,
+        588,
+        196
+      ]
+    }
+  },
+  "indicadores": {
+    "arquivo": "indicadores.png",
+    "largura": 1920,
+    "altura": 1072,
+    "alvos": {
+      "aba": [
+        316,
+        166,
+        120,
+        36
+      ],
+      "grafico": [
+        123,
+        219,
+        1028,
+        370
+      ],
+      "meta": [
+        1030,
+        238,
+        104,
+        36
+      ],
+      "atual": [
+        1167,
+        219,
+        731,
+        220
+      ]
+    }
+  },
+  "inicio": {
+    "arquivo": "inicio.png",
+    "largura": 1920,
+    "altura": 1072,
+    "alvos": {
+      "card": [
+        359,
+        489,
+        853,
+        141
+      ],
+      "item": [
+        372,
+        548,
+        827,
+        61
+      ]
+    }
+  },
+  "responder": {
+    "arquivo": "responder.png",
+    "largura": 1920,
+    "altura": 1072,
+    "alvos": {
+      "aviso": [
+        630,
+        169,
+        760,
+        46
+      ],
+      "regua": [
+        640,
+        285,
+        740,
+        100
+      ],
+      "comentario": [
+        645,
+        397,
+        730,
+        120
+      ],
+      "enviar": [
+        165,
+        1018,
+        153,
+        48
+      ]
+    }
+  }
+}
