@@ -1,0 +1,113 @@
+{
+  "skill_name": "orquestrador",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "simula a orquestração do PI-19 pra eu ver quem pegaria (--simular)",
+      "expected_output": "Card concluído: mostra a entrega, classifica helpdesk-web + nexus no andar Helpdesk e faz uma única pergunta com a opção de card novo ligado.",
+      "files": [],
+      "assertions": [
+        "Informa que o PI-19 já foi entregue, citando comentário de fechamento ou PR/commit",
+        "Faz a pergunta do card entregue com a opção de abrir card novo ligado ao PI-19",
+        "Não propõe a transição para Fazendo como passo normal (só dentro da opção de reabrir)",
+        "Classifica helpdesk-web como principal e nexus como complementar, no andar Helpdesk",
+        "Nenhuma escrita no Jira e nenhum comando maestri executado (ferramentas.md só tem leituras)",
+        "resposta.md tem menos de 9000 caracteres",
+        "Não cola o template do role ('Você é o agente do projeto') na resposta",
+        "Não gera prompt de plano depois da pergunta do card entregue (para no item da pergunta)"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "/orquestrador PI-4 --simular",
+      "expected_output": "Sem prefixo/label e já concluído: sugere bruning-parceiro pela descrição, pergunta o principal, não cria agente para o job-web.",
+      "files": [],
+      "assertions": [
+        "Reconhece que o card não tem prefixo no título nem label de projeto e pergunta qual é o principal",
+        "Sugere bruning-parceiro com evidência da descrição",
+        "Informa que o card já foi entregue",
+        "Não propõe agente/recruit para o job-web nem para o desktop (no máximo cita como dependência externa)",
+        "Nenhuma escrita no Jira e nenhum comando maestri executado (ferramentas.md só tem leituras)",
+        "resposta.md tem menos de 9000 caracteres",
+        "Não cola o template do role ('Você é o agente do projeto') na resposta",
+        "Não gera prompt de plano depois da pergunta do card entregue (para no item da pergunta)"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "orquestra o EIXO-5376 pros agentes, simulando primeiro (--simular)",
+      "expected_output": "Fora do escopo: indica job-web e para, sem oferecer delegar a um agente do job-web.",
+      "files": [],
+      "assertions": [
+        "Declara o card fora do escopo e indica o job-web (Eixo Web)",
+        "Não oferece delegar a um agente do job-web no Maestri, nem como opção",
+        "Nenhuma escrita no Jira e nenhum comando maestri executado (ferramentas.md só tem leituras)",
+        "resposta.md tem menos de 9000 caracteres",
+        "Não cola o template do role ('Você é o agente do projeto') na resposta"
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "--simular: no Conecta, quero que o colaborador consiga anexar o atestado médico direto pela tela de ausências e o RH receba uma notificação na hora",
+      "expected_output": "bruning-rh no andar Conecta, branch develop; pergunta vincular/criar/seguir sem card; preview do card [Conecta] com label conecta.",
+      "files": [],
+      "assertions": [
+        "Classifica como bruning-rh (Conecta) e andar Conecta",
+        "Indica develop como branch base",
+        "Pergunta se é para vincular a um card existente, criar um novo ou seguir sem card",
+        "Preview de card novo com título começando por [Conecta] e label conecta",
+        "Nenhuma escrita no Jira e nenhum comando maestri executado (ferramentas.md só tem leituras)",
+        "resposta.md tem menos de 9000 caracteres",
+        "Não cola o template do role ('Você é o agente do projeto') na resposta",
+        "Usa o agente fixo Global Conecta para o bruning-rh, sem propor recruit para ele"
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "--simular: no portal do parceiro o cliente híbrido está aparecendo duplicado na lista de clientes, e dentro do CRM embutido do helpdesk também aparece duas vezes",
+      "expected_output": "Principal bruning-parceiro, complementar helpdesk-web (CRM embutido), ambos no andar Portal-Parceiros; preview de card [Portal Parceiros].",
+      "files": [],
+      "assertions": [
+        "Classifica bruning-parceiro como principal",
+        "Inclui helpdesk-web como complementar por causa do CRM embutido",
+        "Andar Portal-Parceiros para os dois agentes",
+        "Preview de card novo com título começando por [Portal Parceiros] e label portal-parceiro",
+        "Nenhuma escrita no Jira e nenhum comando maestri executado (ferramentas.md só tem leituras)",
+        "resposta.md tem menos de 9000 caracteres",
+        "Não cola o template do role ('Você é o agente do projeto') na resposta",
+        "Usa o agente fixo Global Parceiros para o bruning-parceiro, sem propor recruit para ele"
+      ]
+    },
+    {
+      "id": 6,
+      "prompt": "--simular: o painel TV do suporte parou de atualizar os tickets do Zendesk desde ontem, manda pra quem resolve",
+      "expected_output": "Problema de dado: nexus investiga primeiro, helpdesk-web (tela) também envolvido ou citado; andar Helpdesk perguntado ou proposto; pergunta sobre card.",
+      "files": [],
+      "assertions": [
+        "Aponta o nexus como provável causa (coleta do Zendesk)",
+        "Reconhece que a tela do painel TV fica no helpdesk-web",
+        "Pergunta se é para vincular a um card existente, criar um novo ou seguir sem card",
+        "Trata o andar: Helpdesk proposto, ou pergunta qual andar usar",
+        "Nenhuma escrita no Jira e nenhum comando maestri executado (ferramentas.md só tem leituras)",
+        "resposta.md tem menos de 9000 caracteres",
+        "Não cola o template do role ('Você é o agente do projeto') na resposta",
+        "Usa o agente fixo Global Helpdesk para o helpdesk-web (se ele entrar), e recruit só para o nexus"
+      ]
+    },
+    {
+      "id": 7,
+      "prompt": "--simular: o aviso de agendamento no Discord parou de sair desde segunda, ninguém da equipe tá sendo avisado",
+      "expected_output": "n8n principal (workflow bruningdesk-aviso-de-agendamento-no-discord); como n8n não tem andar, pergunta o andar; pergunta sobre card.",
+      "files": [],
+      "assertions": [
+        "Classifica o n8n como projeto principal, citando o workflow de aviso de agendamento no Discord",
+        "Pergunta em qual andar o agente do n8n vai trabalhar (n8n não tem andar próprio)",
+        "Pergunta se é para vincular a um card existente, criar um novo ou seguir sem card",
+        "Nenhuma escrita no Jira e nenhum comando maestri executado (ferramentas.md só tem leituras)",
+        "resposta.md tem menos de 9000 caracteres",
+        "Não cola o template do role ('Você é o agente do projeto') na resposta",
+        "Para o n8n (sem agente fixo), propõe recruit com role Projeto: n8n no andar escolhido, sem usar um agente Global para ele"
+      ]
+    }
+  ]
+}

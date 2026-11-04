@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
-# Registra no Claude Code cada skill de skills/ como um link para este checkout.
-# Rodar de novo depois de um `git pull` (é o que a skill claude-skills-atualizar faz).
+# Liga no Claude Code as skills escolhidas de skills/, como links para este checkout.
+#
+# Uso: ./setup                  pergunta quais skills instalar
+#      ./setup --todas          instala todas, sem perguntar
+#      ./setup --skills a,b     instala só essas, sem perguntar
+#      ./setup --atualizar      religa as que já estão instaladas e só lista as novas (usado pela
+#                               skill claude-skills-atualizar, que roda sem terminal interativo)
 set -e
 
 RAIZ="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -10,26 +15,98 @@ mkdir -p "$DESTINO"
 windows=false
 case "${OSTYPE:-}" in msys*|cygwin*) windows=true ;; esac
 
+modo=perguntar
+pedidas=""
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --todas) modo=todas ;;
+    --skills) modo=lista; pedidas="$2"; shift ;;
+    --atualizar) modo=atualizar ;;
+    -h|--help) sed -n '2,9p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+    *) echo "Opção desconhecida: $1" >&2; exit 1 ;;
+  esac
+  shift
+done
+
+nomes=()
+for pasta in "$RAIZ"/skills/*/; do
+  [ -f "$pasta/SKILL.md" ] && nomes+=("$(basename "$pasta")")
+done
+
+descricao() {
+  awk '
+    /^description:/ { sub(/^description: */, ""); if ($0 !~ /^[>|]-?$/ && $0 != "") { print; exit } dobrada = 1; next }
+    dobrada && /^  / { sub(/^ +/, ""); print; exit }
+  ' "$RAIZ/skills/$1/SKILL.md" | cut -c1-90
+}
+
+ligada_aqui() {
+  local link="$DESTINO/$1"
+  [ -L "$link" ] && [ "$(cd "$link" 2>/dev/null && pwd -P)" = "$(cd "$RAIZ/skills/$1" && pwd -P)" ]
+}
+
 ligar() {
-  local origem="$1" link="$2"
+  local nome="$1" link="$DESTINO/$1"
   if [ -L "$link" ]; then
     rm -f "$link"
   elif [ -e "$link" ]; then
-    echo "  pulei $(basename "$link"): já existe uma skill com esse nome que não veio daqui"
+    echo "  pulei $nome: já existe em $DESTINO e não veio daqui (mova ou apague e rode de novo)"
     return
   fi
   if $windows; then
     # Junction não exige modo de desenvolvedor nem administrador, ao contrário do symlink do Windows.
-    powershell -NoProfile -Command "New-Item -ItemType Junction -Path '$(cygpath -w "$link")' -Target '$(cygpath -w "$origem")' | Out-Null"
+    powershell -NoProfile -Command "New-Item -ItemType Junction -Path '$(cygpath -w "$link")' -Target '$(cygpath -w "$RAIZ/skills/$nome")' | Out-Null"
   else
-    ln -s "$origem" "$link"
+    ln -s "$RAIZ/skills/$nome" "$link"
   fi
-  echo "  $(basename "$link")"
+  echo "  $nome"
+  if [ -f "$RAIZ/skills/$nome/configurar.sh" ] && [ "$modo" != atualizar ]; then
+    bash "$RAIZ/skills/$nome/configurar.sh"
+  fi
 }
 
+escolhidas=()
+case "$modo" in
+  todas) escolhidas=("${nomes[@]}") ;;
+  lista) IFS=',' read -r -a escolhidas <<< "$pedidas" ;;
+  atualizar)
+    novas=()
+    for n in "${nomes[@]}"; do
+      if ligada_aqui "$n"; then escolhidas+=("$n"); else novas+=("$n"); fi
+    done
+    ;;
+  perguntar)
+    if [ ! -t 0 ]; then
+      echo "Sem terminal interativo: use --todas ou --skills a,b." >&2
+      exit 1
+    fi
+    echo "Skills disponíveis:"
+    for i in "${!nomes[@]}"; do
+      marca=" "; ligada_aqui "${nomes[$i]}" && marca="*"
+      printf "  %d) [%s] %-26s %s\n" $((i + 1)) "$marca" "${nomes[$i]}" "$(descricao "${nomes[$i]}")"
+    done
+    echo "  [*] = já instalada"
+    read -r -p "Quais instalar? Números separados por espaço, ou Enter para todas: " resposta
+    if [ -z "$resposta" ]; then
+      escolhidas=("${nomes[@]}")
+    else
+      for k in $resposta; do
+        if [[ "$k" =~ ^[0-9]+$ ]] && [ "$k" -ge 1 ] && [ "$k" -le ${#nomes[@]} ]; then
+          escolhidas+=("${nomes[$((k - 1))]}")
+        else
+          echo "  ignorei \"$k\": não está na lista"
+        fi
+      done
+    fi
+    ;;
+esac
+
 echo "Skills em $DESTINO:"
-for pasta in "$RAIZ"/skills/*/; do
-  [ -f "$pasta/SKILL.md" ] || continue
-  ligar "${pasta%/}" "$DESTINO/$(basename "$pasta")"
+for n in "${escolhidas[@]}"; do
+  if [ -f "$RAIZ/skills/$n/SKILL.md" ]; then ligar "$n"; else echo "  não existe skill \"$n\""; fi
 done
+if [ "$modo" = atualizar ] && [ ${#novas[@]} -gt 0 ]; then
+  echo "Não instaladas (para instalar: bash $RAIZ/setup --skills <nome>):"
+  for n in "${novas[@]}"; do echo "  $n — $(descricao "$n")"; done
+fi
 echo "Pronto. Abra uma sessão nova do Claude Code para ele carregar as skills."
