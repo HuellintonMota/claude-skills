@@ -173,6 +173,13 @@ Passos (siga o fluxo de branches do AGENTS.md/CLAUDE.md do projeto):
 <merge + publicação — n8n>
 3. Nada a rodar: monte o checklist de importação (workflow, credenciais, campos
    do nó Config, se precisa ativar) para o usuário fazer na instância.
+<sempre>
+- Se o auto mode bloquear um comando desta lista (o `gh pr merge` ou um push),
+  não peça ao usuário para rodar: mande
+  `maestri ask "<orquestrador>" "BLOQUEADO: <comando exato, com caminho absoluto: git -C <repo> …>"`
+  e espere. Eu rodo no shell "Git Manager" e respondo com a saída; aí você
+  confere (`git fetch` + `git log`/`git status`) e segue. Use
+  `--state blocked` enquanto espera.
 <sempre que houver deploy>
 - Acompanhe o workflow de deploy com `gh run watch` até o fim. Se falhar,
   traga o passo e o erro e não tente de novo por conta própria.
@@ -187,6 +194,32 @@ Não escreva no Jira.
 Ao terminar, responda com
 maestri ask "<orquestrador>" "<relatório: SHA do merge, SHAs promovidos, testes, link e resultado do run, versão/tag, conferência em prod, branch atual>"
 ```
+
+### Comando bloqueado: o shell "Git Manager"
+
+O auto mode costuma bloquear o `gh pr merge` e o push na `main` (que dispara
+o deploy). Para o usuário não precisar digitá-los, há no canvas um shell
+PowerShell chamado **Git Manager**, ligado ao orquestrador (confira em
+"Connected agents" no `maestri list`). Quando um agente pedir
+`BLOQUEADO: <comando>`:
+
+1. Confira que o comando é um passo da publicação que o usuário escolheu na
+   Etapa 8, para este PR. Se não for, recuse e avise o usuário. O shell não
+   muda quem decide.
+2. Recuse force push (`--force`, `-f`, `--force-with-lease`), `reset --hard`,
+   apagar branch remota ou qualquer coisa fora da lista do prompt.
+3. Rode com o caminho absoluto:
+   `maestri ask "Git Manager" --raw "git -C <repo> push origin main\n"`. Ele é
+   PowerShell 5.1: nada de `&&`; encadeie com `;`.
+4. Leia a saída com `maestri check "Git Manager"`. Push e merge podem demorar
+   mais que o retorno do `--raw`, então espere o prompt
+   `PS C:\BruningSistemas_dev>` voltar.
+5. Devolva a saída ao agente com
+   `maestri ask "<agente>" "Rodei no Git Manager: <saída, ex.: f6089049..6d3e4fc0 main -> main>. Confira e siga."`.
+   Se deu erro, mande o erro e não tente de novo por conta própria.
+
+Se o Git Manager não estiver ligado, peça ao usuário para rodar o comando no
+terminal do agente com `!`, como antes.
 
 ## Ajustes e mensagens avulsas
 
