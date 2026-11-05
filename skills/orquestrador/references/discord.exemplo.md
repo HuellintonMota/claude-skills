@@ -1,5 +1,9 @@
 # Aviso no Discord a quem abriu o card
 
+> Modelo versionado. O `setup` copia este arquivo para `references/discord.md`,
+> que fica fora do git: preencha a tabela "Quem é quem" só lá, porque ela tem
+> e-mails e IDs de pessoas.
+
 Quando o card vai para `Concluído` na Etapa 9, quem abriu o card (o
 `reporter` no Jira) recebe uma mensagem privada no Discord. Assim fica sabendo
 que o pedido está em produção sem ter de olhar o Jira.

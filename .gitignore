@@ -6,3 +6,6 @@ __pycache__/
 *.wav
 skills/*/exemplo-enps/remotion/public/audio/
 skills/*/exemplo-enps/remotion/public/capturas/
+
+# Tabela de pessoas (nome, e-mail, IDs do Jira e do Discord): fica só na máquina
+skills/orquestrador/references/discord.md
