@@ -19,6 +19,9 @@
 # Cada skill pode ter um dependencias.sh: confere o que ela precisa, instala sozinho o que fica dentro
 # da pasta da skill (ex.: .venv) e pergunta antes de instalar programas no sistema.
 #
+# No terminal, a escolha é por caixas de seleção (↑/↓ ou k/j, Espaço, a, Enter, q ou Esc). Sem suporte
+# a isso (TERM=dumb) ou com CLAUDE_SKILLS_SEM_MENU=1, a escolha é por números.
+#
 # Testes: CLAUDE_SKILLS_DIR troca a pasta do Claude Code e CLAUDE_SKILLS_HOME troca a pasta pessoal
 # usada para os outros agentes (padrão: $HOME).
 set -e
@@ -28,6 +31,8 @@ SEMPRE="claude-skills-atualizar"
 
 RAIZ="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BASE="${CLAUDE_SKILLS_HOME:-$HOME}"
+# shellcheck source=lib/menu.sh
+. "$RAIZ/lib/menu.sh"
 
 windows=false
 case "${OSTYPE:-}" in msys*|cygwin*) windows=true ;; esac
@@ -128,7 +133,7 @@ while [ $# -gt 0 ]; do
     --sem-dependencias) dependencias=false ;;
     --auto-atualizar) auto=ligar ;;
     --sem-auto-atualizar) auto=desligar ;;
-    -h|--help) sed -n '2,23p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+    -h|--help) sed -n '2,26p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
     *) echo "Opção desconhecida: $1" >&2; exit 1 ;;
   esac
   shift
@@ -190,6 +195,25 @@ elif [ "$modo" = perguntar ] && [ -t 0 ]; then
   done
   if [ "$oferecidos" = " claude" ]; then
     agentes="$padrao"
+  elif menu_suportado; then
+    MENU_ROTULOS=(); MENU_DESCRICOES=(); MENU_MARCADOS=(); ofertas=()
+    for a in $oferecidos; do
+      ofertas+=("$a")
+      MENU_ROTULOS+=("$(agente_nome "$a")")
+      MENU_DESCRICOES+=("$(curto "$(agente_destino "$a")")")
+      if contem "$padrao" "$a"; then MENU_MARCADOS+=(1); else MENU_MARCADOS+=(0); fi
+    done
+    if ! menu_escolher "Em quais agentes instalar?"; then
+      echo "Cancelado: nada foi instalado."
+      exit 0
+    fi
+    for i in "${!ofertas[@]}"; do
+      if [ "${MENU_MARCADOS[$i]}" = 1 ]; then agentes="$agentes ${ofertas[$i]}"; fi
+    done
+    if [ -z "$agentes" ]; then
+      echo "Nenhum agente marcado: nada foi instalado."
+      exit 0
+    fi
   else
     echo "Agentes encontrados nesta máquina:"
     i=0; ofertas=()
@@ -282,23 +306,41 @@ case "$modo" in
       echo "Sem terminal interativo: use --todas ou --skills a,b." >&2
       exit 1
     fi
-    echo "Skills disponíveis:"
-    for i in "${!nomes[@]}"; do
-      marca=" "; ligada_algum "${nomes[$i]}" && marca="*"
-      printf "  %d) [%s] %-26s %s\n" $((i + 1)) "$marca" "${nomes[$i]}" "$(descricao "${nomes[$i]}")"
-    done
-    echo "  [*] = já instalada"
-    read -r -p "Quais instalar? Números separados por espaço, ou Enter para todas: " resposta
-    if [ -z "$resposta" ]; then
-      escolhidas=("${nomes[@]}")
-    else
-      for k in $resposta; do
-        if [[ "$k" =~ ^[0-9]+$ ]] && [ "$k" -ge 1 ] && [ "$k" -le ${#nomes[@]} ]; then
-          escolhidas+=("${nomes[$((k - 1))]}")
-        else
-          echo "  ignorei \"$k\": não está na lista"
-        fi
+    if menu_suportado; then
+      # Vêm marcadas as já instaladas; na primeira vez, todas, como o Enter do modo numérico.
+      MENU_ROTULOS=(); MENU_DESCRICOES=(); MENU_MARCADOS=(); alguma=false
+      for n in "${nomes[@]}"; do if ligada_algum "$n"; then alguma=true; fi; done
+      for n in "${nomes[@]}"; do
+        MENU_ROTULOS+=("$n")
+        MENU_DESCRICOES+=("$(descricao "$n")")
+        if ! $alguma || ligada_algum "$n"; then MENU_MARCADOS+=(1); else MENU_MARCADOS+=(0); fi
       done
+      if ! menu_escolher "Quais skills instalar? (a $SEMPRE vai sempre)"; then
+        echo "Cancelado: nada foi instalado."
+        exit 0
+      fi
+      for i in "${!nomes[@]}"; do
+        if [ "${MENU_MARCADOS[$i]}" = 1 ]; then escolhidas+=("${nomes[$i]}"); fi
+      done
+    else
+      echo "Skills disponíveis:"
+      for i in "${!nomes[@]}"; do
+        marca=" "; ligada_algum "${nomes[$i]}" && marca="*"
+        printf "  %d) [%s] %-26s %s\n" $((i + 1)) "$marca" "${nomes[$i]}" "$(descricao "${nomes[$i]}")"
+      done
+      echo "  [*] = já instalada"
+      read -r -p "Quais instalar? Números separados por espaço, ou Enter para todas: " resposta
+      if [ -z "$resposta" ]; then
+        escolhidas=("${nomes[@]}")
+      else
+        for k in $resposta; do
+          if [[ "$k" =~ ^[0-9]+$ ]] && [ "$k" -ge 1 ] && [ "$k" -le ${#nomes[@]} ]; then
+            escolhidas+=("${nomes[$((k - 1))]}")
+          else
+            echo "  ignorei \"$k\": não está na lista"
+          fi
+        done
+      fi
     fi
     ;;
 esac

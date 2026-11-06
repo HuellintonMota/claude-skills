@@ -46,9 +46,37 @@ repositório, ou atualiza se ele já existe, e roda o mesmo `setup` com o bash d
 | OpenCode | `opencode` | `~/.config/opencode/skills` | [docs](https://opencode.ai/docs/skills) |
 | GitHub Copilot CLI | `copilot` | `~/.copilot/skills` | [docs](https://docs.github.com/en/copilot/concepts/agents/about-agent-skills) |
 
-**No modo interativo**, o setup mostra o Claude Code e os agentes que achou na máquina. Ele procura o
-comando do agente ou a pasta de configuração dele. Vêm marcados os agentes onde as skills já estão
-instaladas. Na primeira vez, vem marcado só o Claude Code. Enter mantém os marcados.
+**No modo interativo**, o setup mostra duas listas de caixas de seleção: primeiro os agentes, depois
+as skills.
+
+```
+Em quais agentes instalar?
+  [x] Claude Code         ~/.claude/skills
+> [x] Codex CLI           ~/.agents/skills
+  [ ] GitHub Copilot CLI  ~/.copilot/skills
+  ↑↓ mover · Espaço marcar · a todos · Enter confirmar · Esc sair
+```
+
+| Tecla | O que faz |
+|---|---|
+| ↑ ↓ (ou k j) | Move o cursor `>`. |
+| Espaço | Marca ou desmarca o item. |
+| a | Marca todos. Se todos já estão marcados, desmarca todos. |
+| Enter | Confirma. |
+| Esc ou q | Cancela e sai sem instalar nada. |
+
+- Na lista de agentes aparecem o Claude Code e os agentes achados na máquina. O setup procura o
+  comando do agente ou a pasta de configuração dele.
+- Vêm marcados os agentes onde as skills já estão instaladas. Na primeira vez, vem marcado só o
+  Claude Code.
+- Na lista de skills, vêm marcadas as já instaladas. Na primeira vez, vêm todas marcadas. A
+  `claude-skills-atualizar` vai sempre.
+- Lista maior que a tela rola junto com o cursor.
+- Sem agente marcado, o setup sai sem instalar nada. Sem skill marcada, instala só a
+  `claude-skills-atualizar`.
+
+Num terminal sem suporte (`TERM=dumb`) ou com `CLAUDE_SKILLS_SEM_MENU=1`, a escolha volta a ser por
+números digitados.
 
 **Sem perguntar:**
 
@@ -183,6 +211,8 @@ instaladas e lista as novas.
   em `~/.claude/skills` ou `~/.agents/skills`. Remova o link da pasta própria.
 - **"Sem terminal interativo"**: o setup foi chamado por um agente, sem terminal. Use `--agente` com
   `--todas` ou `--skills`.
+- **As setas não respondem ou a lista se desenha torta**: rode com `CLAUDE_SKILLS_SEM_MENU=1` para
+  escolher por números, ou use `--agente` com `--skills`.
 - **O PowerShell bloqueia o script**: rode com `powershell -ExecutionPolicy Bypass -File install.ps1`.
 - **"atualização automática pulada, há alterações locais"**: alguém editou arquivos no checkout. Veja
   com `git -C ~/.claude/claude-skills status` e resolva antes de atualizar.
