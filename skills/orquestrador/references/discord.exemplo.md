@@ -10,7 +10,96 @@ que o pedido está em produção sem ter de olhar o Jira.
 
 ## Como enviar
 
-O envio usa o subfluxo do n8n `Discord - Enviar mensagem (subfluxo)`
+Quem envia é o terminal **Executor**, a pedido do orquestrador, depois que o usuário
+confirma o preview (destinatário e texto). Sem Executor ligado, o orquestrador envia.
+
+O envio sai pelo portal **"Discord"** do Maestri, ligado ao Executor e logado
+na conta do usuário. **A mensagem sai em nome do usuário**, como se ele mesmo
+tivesse escrito. Por isso só vai o texto do preview aprovado, sem trocar nem
+acrescentar nada, e só para a pessoa da tabela "Quem é quem".
+
+1. Abra o perfil da pessoa pelo ID:
+
+   ```bash
+   maestri portal navigate "Discord" "https://discord.com/users/<user_id>"
+   maestri portal snapshot "Discord"
+   ```
+
+   O Discord volta para `channels/@me` e abre por cima o modal
+   `dialog "Perfil de <Nome> ..."`, com o botão `"Mensagem"`. O modal pode
+   levar alguns segundos para carregar. Se ele ainda não estiver no snapshot,
+   rode o snapshot de novo. Não confunda com os botões `"Mensagem <Nome>"` da
+   lista de amigos ao fundo: use o `"Mensagem"` sem nome, que vem logo depois
+   do `dialog`.
+
+2. Abra a DM: `maestri portal click "Discord" @eN` (o `"Mensagem"` do modal).
+
+3. **Confira o destinatário antes de digitar.** Os três sinais têm de trazer o
+   nome da linha da tabela:
+
+   ```bash
+   maestri portal info "Discord"
+   #   title: • Discord | @<Nome>    url: https://discord.com/channels/@me/<canal da DM>
+   maestri portal snapshot "Discord" | grep -E ' main | textbox '
+   #   main "<Nome> (canal)"    textbox "Conversar em @<Nome>"
+   ```
+
+   Se algum dos sinais trouxer outro nome, pare e avise o orquestrador.
+
+4. Digite a mensagem. Cada linha vai com `type`. Para quebrar a linha sem
+   enviar, use `shift+Enter`. Para deixar uma linha em branco, use
+   `shift+Enter` duas vezes:
+
+   ```bash
+   maestri portal click "Discord" @eN            # textbox "Conversar em @<Nome>"
+   maestri portal type "Discord" "<linha 1>"
+   maestri portal key "Discord" "shift+Enter"
+   maestri portal key "Discord" "shift+Enter"
+   maestri portal type "Discord" "<linha 2>"
+   ```
+
+   Se a caixa já tinha um rascunho, limpe antes de digitar
+   (`maestri portal selectall "Discord" @eN` e depois
+   `maestri portal clear "Discord" @eN`). Antes de enviar, leia a caixa com
+   `maestri portal text "Discord" @eN` e compare com o preview. Também confira
+   que não há uma lista de sugestões aberta (emoji, menção), porque com ela
+   aberta o `Enter` escolhe a sugestão em vez de enviar. Se houver, feche-a com
+   `maestri portal key "Discord" "Escape"`.
+
+5. Envie: `maestri portal key "Discord" "Enter"`.
+
+6. **Confira que a mensagem foi enviada.** Espere uns segundos e leia a última
+   mensagem da conversa:
+
+   ```bash
+   maestri portal evaluate "Discord" "(()=>{const li=[...document.querySelectorAll('ol[data-list-id=chat-messages] > li[id^=chat-messages-]')].pop();return JSON.stringify({texto:li?.querySelector('[id^=message-content-]')?.innerText,pendente:!!li?.querySelector('[class*=isSending],[class*=isFailed]'),caixa:document.querySelector('[role=textbox]')?.innerText.trim()})})()"
+   maestri portal check "Discord"
+   ```
+
+   O envio deu certo quando `texto` é o texto enviado, `pendente` é `false`, a
+   `caixa` está vazia e o screenshot não mostra aviso vermelho de falha. Para o
+   orquestrador, devolva a URL da DM (`maestri portal info`) e a primeira linha
+   da mensagem como ela aparece na conversa. Se a mensagem ficou em vermelho,
+   ou se o Discord avisou que não é possível enviar mensagens a esse usuário,
+   **não reenvie**: devolva o erro.
+
+7. Volte o portal para a lista de DMs:
+   `maestri portal navigate "Discord" "https://discord.com/channels/@me"`.
+
+**Quando parar sem enviar.** Pare e avise o orquestrador, sem tentar outro
+caminho (nem o webhook, nem a busca de conversas, nem outra conta), quando:
+
+- o portal "Discord" não aparece em `maestri list`;
+- o portal está deslogado (a URL vai para `/login` ou a tela pede para entrar).
+  Não faça login;
+- o perfil não abre (o snapshot não mostra o `dialog` com o botão
+  `"Mensagem"`);
+- o nome não bate em algum dos sinais do passo 3.
+
+### Alternativa: webhook do n8n
+
+Use só quando o orquestrador pedir este caminho. O envio usa o subfluxo do n8n
+`Discord - Enviar mensagem (subfluxo)`
 (`n8n/discord-enviar-mensagem-subfluxo`, workflow `HrV4IGdj1CkR3HSA`). Ele é
 compartilhado com outros fluxos: só o chame, nunca o altere.
 

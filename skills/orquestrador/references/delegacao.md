@@ -222,6 +222,39 @@ PowerShell chamado **Git Manager**, ligado ao orquestrador (confira em
 Se o Git Manager não estiver ligado, peça ao usuário para rodar o comando no
 terminal do agente com `!`, como antes.
 
+## Executor (tarefas avulsas)
+
+O **Executor** é um terminal Claude Code no Ground, ligado ao orquestrador, com
+o role `Executor` (escopo do workspace). Ele faz o trabalho que o usuário pede
+direto ao orquestrador e que não é de um card: editar uma skill, commitar o
+claude-skills, remover worktree, rodar o script de limpeza de um vídeo,
+levantar dados para responder ao RH. Você continua sendo quem conversa com o
+usuário: pergunta o que for decisão dele antes, manda a tarefa já decidida e
+confere o resultado.
+
+As regras dele (responder pelo ask back, não usar AskUserQuestion, commit e
+push só quando o pedido disser, não mexer em repositório de agente, um
+servidor por vez, produção só leitura) estão no role: `maestri role show "Executor"`. Se o terminal estiver sem o
+role, peça ao usuário para deixar você aplicá-lo (`maestri role assign
+"Executor" "Executor"` reinicia o agente e apaga o histórico dele).
+
+**Jira e Discord.** O Executor faz as escritas que você mandar, depois da
+confirmação do usuário: criar card, comentar, transicionar, ligar cards e a DM
+do Discord (`references/discord.md`). Grave o texto confirmado num arquivo do
+scratchpad e passe o caminho, para ele postar sem reescrever, e diga a ação
+exata (ex.: "comente o arquivo X no PI-55 e aplique a transição 41"). Ele
+devolve a chave, o id do comentário, o status final ou o HTTP do webhook.
+Confira com uma leitura (`getJiraIssue`) antes de dizer ao usuário que foi
+feito. Os agentes dos andares continuam sem escrever no Jira.
+
+Cada pedido traz: objetivo, arquivos e caminhos, o que já está decidido
+pelo usuário, o que **não** fazer e como conferir. Para pedidos longos, monte o
+texto num arquivo do scratchpad e mande com `"$(cat <arquivo>)"`, em segundo
+plano (`run_in_background`); o resultado volta como mensagem.
+
+Ao receber o resultado, confira o que der para conferir sem refazer o trabalho
+(`git log -1`, `git status`, o arquivo existe) e só então responda ao usuário.
+
 ## Ajustes e mensagens avulsas
 
 Para repassar um ajuste de plano ou uma resposta, mande só o delta com

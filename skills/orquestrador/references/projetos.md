@@ -135,7 +135,7 @@ pedir). Os nomes estão em cada projeto abaixo; passe-os no briefing.
 - **Stack:** Laravel 13 + Inertia v3 + Vue 3 + Tailwind v4 + Vite 8; MySQL também nos testes (`indicacao_marketing` / `indicacao_marketing_test`, nada de SQLite); Laravel Boost como MCP (`.mcp.json`).
 - **Branch base:** `main` (a `indica-eixo` remota está no mesmo commit). Branches `feat/PI-n-slug` / `fix/PI-n-slug`.
 - **Publicação:** ainda não há deploy (sem Actions nem servidor). Opções: **só o PR** ou **merge**. Quando houver produção, atualize aqui.
-- **Fluxo:** padrão. Formatação com Pint; testes com `composer test`.
+- **Fluxo:** padrão. Formatação com Pint; testes com `composer test`. **Obrigatórios** (decisão do usuário, PI-55): `/simplify` antes do commit e `/code-review` no PR, com os ajustes aplicados antes da publicação. Ponha os dois no prompt de implementação, porque o CLAUDE.md do projeto não os exige.
 - **Dev:** `php artisan serve --port=8030` com os assets do build (não precisa do Vite). Usuários do seed: `admin@`, `marketing@`, `sucesso@`, `comercial@`, `financeiro@` e `demo@indicacao.test` (cliente). O Boost só sobe depois de existirem `vendor/` e `.env`; se a sessão abriu antes, reconecte pelo `/mcp`.
 - **Contexto:** `CLAUDE.md`, `AGENTS.md`, `README.md` (regras de negócio) e as skills em `.claude/skills/`.
 - **Palavras:** Indica Eixo, indicar empresa/oficina, indicação de cliente, contador ou parceiro, campanha de indicação, recompensa, PIX de indicação, desconto na mensalidade, funil de indicação, regulamento, CAC/MRR das indicações.

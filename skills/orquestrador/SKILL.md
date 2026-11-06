@@ -31,6 +31,23 @@ canvas refletindo o estado real. O código é escrito pelos agentes nos andares
 de cada projeto, que conhecem as regras do próprio repositório (CLAUDE.md,
 rules, dev-flow) muito melhor do que você conseguiria de fora.
 
+O que o usuário pedir fora do fluxo de um card (mexer numa skill, remover um
+worktree, apagar dados de teste, investigar um pedido do RH, rodar um script)
+vai para o terminal **Executor** no Ground, se ele estiver em "Connected
+agents" no `maestri list`. Você monta o pedido, confere o resultado e responde
+ao usuário; quem lê arquivos, roda comandos e edita é ele. Fica com você só o
+que é orquestração: notas, `floor status`, prompts aos agentes, conferência no
+GitHub (`gh pr view`, `gh run view`), o shell Git Manager e **o conteúdo e a
+confirmação** de tudo que vai para o Jira e o Discord.
+
+As **escritas** no Jira (criar card, comentar, transicionar, ligar cards) e a
+DM no Discord também vão para o Executor: você monta o texto, mostra o preview,
+o usuário confirma, e o Executor aplica exatamente aquilo e devolve a prova
+(chave, id do comentário, status, HTTP). Leituras no Jira (`getJiraIssue`,
+transições disponíveis, busca) continuam com você, porque decidem a
+orquestração. Regras em `references/delegacao.md`, seção "Executor". Sem
+Executor ligado, faça você mesmo, como antes.
+
 Referências (leia quando chegar na etapa correspondente):
 - `references/projetos.md` — mapa dos projetos e regras de classificação.
 - `references/delegacao.md` — role do Maestri e prompts de plano/implementação.
@@ -394,7 +411,9 @@ Com todos os relatórios em mãos (e o resultado da Etapa 8):
    Se a Etapa 8 publicou algo, inclua no mesmo comentário uma seção
    `### Publicação` com o que foi feito em cada projeto: merge (SHA), versão ou
    tag, link do run do deploy, migrations e a conferência em produção.
-2. Mostre o preview, confirme e poste com `addCommentToJiraIssue`.
+2. Mostre o preview, confirme e mande o Executor postar (`addCommentToJiraIssue`)
+   com o texto do arquivo, junto com a transição do passo 3 se ela já estiver
+   decidida.
 3. `getTransitionsForJiraIssue` e proponha a transição pelo que aconteceu na
    Etapa 8, confirme e aplique:
    - todos os projetos do card em produção → `Concluído`;
@@ -444,9 +463,10 @@ usuário escolher um card novo ou reabrir.
   ruído permanente.
 - **Nenhuma mensagem no Discord sem preview e confirmação**, e só por DM a
   quem abriu o card: nunca em canal, nunca para outra pessoa.
-- **Só você escreve no Jira.** Os agentes de projeto são instruídos a pular a
-  etapa de comentário do dev-flow — senão o card recebe um comentário por
-  projeto e mais o seu.
+- **Só o orquestrador escreve no Jira**, pelas mãos do Executor e com a
+  confirmação do usuário. Os agentes de projeto são instruídos a pular a etapa
+  de comentário do dev-flow — senão o card recebe um comentário por projeto e
+  mais o seu.
 - **Merge e deploy só pela Etapa 8, com a escolha explícita do usuário para
   aquele projeto.** Fora dela, nem você nem os agentes fazem merge. No
   helpdesk-web e no parceiro, merge na `main` é deploy em produção; no rh, a
@@ -456,3 +476,6 @@ usuário escolher um card novo ou reabrir.
 - **Card fora do escopo para na Etapa 1**, com a indicação de onde ele iria.
 - **Card entregue não é reorquestrado sem escolha explícita** do usuário.
 - **Notas e andares não são apagados** sem pedido explícito do usuário.
+- **Tarefa avulsa vai para o Executor**, não para você: commit, push e
+  qualquer escrita que ele fizer seguem as mesmas regras (só com o pedido do
+  usuário, nunca force push, nada em repositório que um agente está mexendo).
