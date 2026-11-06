@@ -9,14 +9,17 @@ description: Atualiza as skills do repositório HuellintonMota/claude-skills (gi
    `<checkout>` é `cd -P "<pasta desta skill>/../.." && pwd`. O padrão de instalação é
    `~/.claude/claude-skills`.
 2. `git -C <checkout> status --porcelain`: se houver alteração local, mostre e pergunte antes de seguir.
-3. Guarde `git -C <checkout> rev-parse --short HEAD`, rode `git -C <checkout> pull --ff-only` e depois
+3. Guarde `git -C <checkout> rev-parse --short HEAD` e a versão (`cat <checkout>/VERSION`; sem o
+   arquivo, a versão é "?"), rode `git -C <checkout> pull --ff-only` e depois
    `bash <checkout>/setup --atualizar` (religa as instaladas em todos os agentes onde estão; o setup
    interativo não funciona aqui, porque o shell do agente não tem terminal).
 4. Repasse a conferência de dependências que o setup imprime: itens com ✗ são o que falta, com o
    comando para resolver. Programa do sistema só se instala com o "sim" da pessoa
    (`bash <checkout>/setup --skills <nome> --sim`).
-5. Mostre o que mudou: `git -C <checkout> log --oneline <antes>..HEAD`. Se nada mudou, diga que já
-   estava na última versão.
+5. Mostre o que mudou: a versão antiga e a nova (`<antiga> → <nova>`) e, do `<checkout>/CHANGELOG.md`,
+   as seções das versões entre as duas. Se a versão não mudou, mostre
+   `git -C <checkout> log --oneline <antes>..HEAD`. Se nada mudou, diga que já estava na última
+   versão (`bash <checkout>/setup --versao`).
 6. Se o setup listar skills novas não instaladas, mostre-as e pergunte quais instalar; instale com
    `bash <checkout>/setup --skills a,b`.
 7. Lembre que skills novas só aparecem numa sessão nova do agente.
@@ -27,10 +30,12 @@ Se pedirem para as skills se atualizarem sozinhas (ou para parar), rode
 `bash <checkout>/setup --atualizar --auto-atualizar` (ou `--sem-auto-atualizar`). Isso liga ou
 desliga um hook `SessionStart` no `settings.json` do Claude Code, que roda `lib/auto-atualizar.sh` uma
 vez por dia. Quando ele atualiza, a sessão recebe uma mensagem "claude-skills atualizadas
-automaticamente" com os commits: conte à pessoa o que mudou e, se aparecerem skills novas não
+automaticamente: <antiga> → <nova>" com as novidades do changelog (ou os commits, se a versão não
+mudou): conte à pessoa o que mudou e, se aparecerem skills novas não
 instaladas, ofereça instalar.
 
-As outras skills conferem se há versão nova antes de começar (`lib/verificar-atualizacao.sh`) e
-oferecem "Atualizar agora" ou "Adiar por 1 dia". O adiamento fica em `.git/adiar-atualizacao-ate` e
+As outras skills conferem se há versão nova antes de começar (`lib/verificar-atualizacao.sh`, que
+imprime `ATUALIZACAO_DISPONIVEL <local> <nova> <n commits>` e as novidades) e oferecem "Atualizar
+agora" ou "Adiar por 1 dia". O adiamento fica em `.git/adiar-atualizacao-ate` e
 também segura a atualização automática; esta skill (pedido explícito) atualiza mesmo adiada e apaga o
 adiamento: `rm -f <checkout>/.git/adiar-atualizacao-ate`.

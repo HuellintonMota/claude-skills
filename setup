@@ -11,6 +11,7 @@
 #                               os detectados). Sem a opção: onde já estão instaladas; na primeira
 #                               vez, só o Claude Code
 #      --agentes                lista os agentes, onde cada um guarda skills e quais foram detectados
+#      --versao                 mostra a versão das claude-skills deste checkout
 #      --sim                    instala dependências do sistema que faltarem sem perguntar
 #      --sem-dependencias       não confere dependências
 #      --auto-atualizar         liga a atualização automática (uma vez por dia, ao abrir o Claude Code)
@@ -31,6 +32,8 @@ SEMPRE="claude-skills-atualizar"
 
 RAIZ="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BASE="${CLAUDE_SKILLS_HOME:-$HOME}"
+VERSAO="$(head -1 "$RAIZ/VERSION" 2>/dev/null | tr -d '\r ')"
+VERSAO="${VERSAO:-?}"
 # shellcheck source=lib/menu.sh
 . "$RAIZ/lib/menu.sh"
 
@@ -129,11 +132,12 @@ while [ $# -gt 0 ]; do
     --agente|--host) pedidos_agentes="$2"; shift ;;
     --agente=*|--host=*) pedidos_agentes="${1#*=}" ;;
     --agentes) listar_agentes=true ;;
+    --versao) echo "$VERSAO"; exit 0 ;;
     --sim) DEP_MODO=sim ;;
     --sem-dependencias) dependencias=false ;;
     --auto-atualizar) auto=ligar ;;
     --sem-auto-atualizar) auto=desligar ;;
-    -h|--help) sed -n '2,26p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+    -h|--help) sed -n '2,27p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
     *) echo "Opção desconhecida: $1" >&2; exit 1 ;;
   esac
   shift
@@ -419,4 +423,4 @@ fi
 abrir=""
 for a in $agentes; do abrir="$abrir, $(agente_nome "$a")"; done
 for par in $lidos_por; do abrir="$abrir, $(agente_nome "${par%%:*}")"; done
-echo "Pronto. Abra uma sessão nova (${abrir#, }) para carregar as skills."
+echo "Pronto: claude-skills $VERSAO. Abra uma sessão nova (${abrir#, }) para carregar as skills."

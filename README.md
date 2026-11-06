@@ -3,6 +3,9 @@
 Skills para o Claude Code e para outros agentes que leem skills no formato `SKILL.md`: Codex CLI,
 Gemini CLI, Antigravity, Cursor, OpenCode, GitHub Copilot CLI, Kiro e Factory Droid.
 
+**Versão 0.5.0** · [o que mudou em cada versão](CHANGELOG.md) · `bash ~/.claude/claude-skills/setup --versao`
+mostra a versão instalada.
+
 | Skill | Para quê | Onde funciona |
 |---|---|---|
 | [`claude-skills-atualizar`](skills/claude-skills-atualizar/SKILL.md) | Atualiza este repositório (pull + setup). Instalada sempre, sem aparecer na escolha. | Qualquer agente com shell. |
@@ -134,6 +137,7 @@ As skills foram escritas para o Claude Code. Nos outros agentes:
 |---|---|---|
 | `--agente a,b` (ou `--host`) | `-Agente a,b` | Em quais agentes instalar. `auto` = todos os detectados. |
 | `--agentes` | | Lista os agentes, as pastas e quais foram detectados. |
+| `--versao` | | Mostra a versão das claude-skills. |
 | `--todas` | `-Todas` | Instala todas as skills, sem perguntar. |
 | `--skills a,b` | `-Skills a,b` | Instala só essas skills, sem perguntar. |
 | `--atualizar` | | Religa as skills já instaladas, em cada agente, e lista as novas. |
@@ -150,14 +154,15 @@ Todos os agentes apontam para o mesmo checkout. Atualizar o checkout atualiza as
 **Automática (só Claude Code).** O setup pergunta se liga. Também dá para usar `--auto-atualizar` e
 `--sem-auto-atualizar`. Ligada, um hook `SessionStart` no `~/.claude/settings.json` roda
 `lib/auto-atualizar.sh` ao abrir o Claude Code, no máximo uma vez por dia. Ele faz
-`git pull --ff-only`, religa as skills em todos os agentes e conta na sessão o que mudou. Sem rede,
+`git pull --ff-only`, religa as skills em todos os agentes e conta na sessão o que mudou, por
+exemplo "claude-skills atualizadas automaticamente: 0.4.0 → 0.5.0", com o trecho do changelog. Sem rede,
 ou com alteração local no checkout, não faz nada. Para editar o `settings.json` o setup usa Python.
 Sem Python, ele mostra o hook para colar à mão. Os outros agentes não têm esse hook. Se o Claude
 Code também está instalado com a automática ligada, ela já atualiza o checkout de todos.
 
 **Antes de usar (qualquer agente com shell).** Cada skill confere se há versão nova
-(`lib/verificar-atualizacao.sh`, com um `git fetch` a cada 10 minutos no máximo). Se houver, pergunta:
-**Atualizar agora** ou **Adiar por 1 dia**.
+(`lib/verificar-atualizacao.sh`, com um `git fetch` a cada 10 minutos no máximo). Se houver, mostra a
+versão atual, a nova e o que mudou no changelog, e pergunta: **Atualizar agora** ou **Adiar por 1 dia**.
 
 **Adiar.** "Adiar por 1 dia" para de perguntar até o dia seguinte. Também segura a atualização
 automática.
@@ -171,6 +176,22 @@ git -C ~/.claude/claude-skills pull --ff-only && bash ~/.claude/claude-skills/se
 
 O `pull` já atualiza as skills existentes, porque elas são links. O `setup --atualizar` religa as
 instaladas e lista as novas.
+
+## Lançar uma versão
+
+As versões seguem o formato X.Y.Z: X muda o que quebra a instalação ou o uso, Y traz recurso novo e
+Z é correção. Enquanto a versão não sai, cada mudança entra em "[Não lançado]" no `CHANGELOG.md`.
+
+1. Troque o número no `VERSION` e na linha "Versão" do topo deste README.
+2. No `CHANGELOG.md`, renomeie "[Não lançado]" para `[X.Y.Z] - AAAA-MM-DD` e crie um "[Não lançado]"
+   vazio acima dele. Escreva para quem usa as skills, não para quem programa.
+3. Faça o commit e a tag anotada, e mande os dois juntos:
+
+   ```bash
+   git commit -am "chore: versão X.Y.Z"
+   git tag -a vX.Y.Z -m "vX.Y.Z"
+   git push --follow-tags
+   ```
 
 ## Desinstalar
 

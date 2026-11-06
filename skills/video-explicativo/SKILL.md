@@ -18,7 +18,10 @@ está em `exemplo-enps/` (código, roteiro e plano; sem áudios, capturas e node
 ## Antes de começar: versão nova?
 
 Rode `bash "$(cd -P "<pasta desta skill>/../.." && pwd)/lib/verificar-atualizacao.sh"`. Sem saída, siga.
-Se imprimir `ATUALIZACAO_DISPONIVEL <n>` e os commits, pergunte (AskUserQuestion), mostrando os commits:
+Se imprimir `ATUALIZACAO_DISPONIVEL <versão local> <versão nova> <n commits>`, as linhas seguintes são
+as novidades: as seções do CHANGELOG entre as duas versões, ou os commits quando a versão não mudou
+("?" é uma versão anterior ao controle de versão). Pergunte (AskUserQuestion) "Há versão nova das
+claude-skills: <local> → <nova>", com as novidades no texto da pergunta:
 - **Atualizar agora** (recomendado): rode o mesmo script com `atualizar` e **leia este SKILL.md de novo**
   antes de seguir, porque ele pode ter mudado.
 - **Adiar por 1 dia**: rode com `adiar`; não pergunta mais (nem atualiza sozinho) até amanhã, e siga.

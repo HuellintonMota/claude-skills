@@ -3,6 +3,8 @@
 # claude-skills no máximo uma vez por dia. Não diz nada quando não há novidade; quando atualiza, a linha
 # impressa entra no contexto da sessão, e o Claude pode contar à pessoa o que mudou.
 RAIZ="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+# shellcheck source=versao.sh
+. "$RAIZ/lib/versao.sh"
 MARCA="$RAIZ/.git/ultima-atualizacao-automatica"
 hoje="$(date +%Y-%m-%d)"
 
@@ -27,8 +29,14 @@ depois="$(git -C "$RAIZ" rev-parse HEAD)"
 [ "$antes" = "$depois" ] && exit 0
 
 novas="$(bash "$RAIZ/setup" --atualizar --sem-dependencias 2>/dev/null | sed -n '/^Não instaladas/,/^Pronto/p' | sed '/^Pronto/d')"
-echo "claude-skills atualizadas automaticamente (${antes:0:7} → ${depois:0:7}):"
-git -C "$RAIZ" log --oneline --no-decorate "$antes..$depois" | sed 's/^/  /'
+versao_antes="$(versao_em "$antes")"
+versao_depois="$(versao_em "$depois")"
+if [ "$versao_antes" != "$versao_depois" ]; then
+  echo "claude-skills atualizadas automaticamente: $versao_antes → $versao_depois"
+else
+  echo "claude-skills atualizadas automaticamente ($versao_depois, ${antes:0:7} → ${depois:0:7}):"
+fi
+novidades_entre "$antes" "$depois" | sed 's/^/  /'
 [ -n "$novas" ] && echo "$novas"
 echo "Se alguma skill reclamar de dependência, peça \"atualizar as claude-skills\" para conferir."
 exit 0

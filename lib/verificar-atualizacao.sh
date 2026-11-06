@@ -2,7 +2,9 @@
 # Confere se há versão nova das claude-skills antes de uma skill ser usada.
 #
 # Uso: verificar-atualizacao.sh            não imprime nada se está em dia, se não há rede ou se a
-#                                          pessoa adiou; senão, "ATUALIZACAO_DISPONIVEL <n>" e os commits
+#                                          pessoa adiou; senão, "ATUALIZACAO_DISPONIVEL <versão local>
+#                                          <versão nova> <n commits>" e as novidades do CHANGELOG
+#                                          (ou os commits, quando a versão não mudou)
 #      verificar-atualizacao.sh atualizar  pull --ff-only + setup --atualizar
 #      verificar-atualizacao.sh adiar      não pergunta mais até amanhã (vale também para a automática)
 #
@@ -10,6 +12,8 @@
 # repositório.
 RAIZ="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 ADIAR="$RAIZ/.git/adiar-atualizacao-ate"
+# shellcheck source=versao.sh
+. "$RAIZ/lib/versao.sh"
 hoje="$(date +%Y-%m-%d)"
 
 case "${1:-verificar}" in
@@ -25,9 +29,10 @@ case "${1:-verificar}" in
       exit 1
     fi
     antes="$(git -C "$RAIZ" rev-parse --short HEAD)"
+    versao_antes="$(versao_em HEAD)"
     git -C "$RAIZ" pull --ff-only -q || exit 1
     bash "$RAIZ/setup" --atualizar
-    echo "Atualizado de $antes para $(git -C "$RAIZ" rev-parse --short HEAD)."
+    echo "Atualizado de $versao_antes ($antes) para $(versao_em HEAD) ($(git -C "$RAIZ" rev-parse --short HEAD))."
     ;;
   verificar)
     # Datas em AAAA-MM-DD comparam como texto: adiado enquanto hoje for antes da data gravada.
@@ -42,11 +47,11 @@ case "${1:-verificar}" in
     fi
     atras="$(git -C "$RAIZ" rev-list --count HEAD..@{u} 2>/dev/null)" || exit 0
     [ "${atras:-0}" -gt 0 ] || exit 0
-    echo "ATUALIZACAO_DISPONIVEL $atras"
-    git -C "$RAIZ" log --oneline --no-decorate HEAD..@{u}
+    echo "ATUALIZACAO_DISPONIVEL $(versao_em HEAD) $(versao_em '@{u}') $atras"
+    novidades_entre HEAD '@{u}'
     ;;
   *)
-    sed -n '2,8p' "$0" | sed 's/^# \{0,1\}//'
+    sed -n '2,10p' "$0" | sed 's/^# \{0,1\}//'
     exit 1
     ;;
 esac
