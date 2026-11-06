@@ -5,12 +5,13 @@ description: Atualiza as skills do repositório HuellintonMota/claude-skills (gi
 
 # Atualizar claude-skills
 
-1. Ache o checkout: o alvo do link `~/.claude/skills/claude-skills-atualizar` aponta para
-   `<checkout>/skills/claude-skills-atualizar`. O padrão de instalação é `~/.claude/claude-skills`.
+1. Ache o checkout: esta skill é um link para `<checkout>/skills/claude-skills-atualizar`, então
+   `<checkout>` é `cd -P "<pasta desta skill>/../.." && pwd`. O padrão de instalação é
+   `~/.claude/claude-skills`.
 2. `git -C <checkout> status --porcelain`: se houver alteração local, mostre e pergunte antes de seguir.
 3. Guarde `git -C <checkout> rev-parse --short HEAD`, rode `git -C <checkout> pull --ff-only` e depois
-   `bash <checkout>/setup --atualizar` (religa as instaladas; o setup interativo não funciona aqui,
-   porque o Bash do Claude Code não tem terminal).
+   `bash <checkout>/setup --atualizar` (religa as instaladas em todos os agentes onde estão; o setup
+   interativo não funciona aqui, porque o shell do agente não tem terminal).
 4. Repasse a conferência de dependências que o setup imprime: itens com ✗ são o que falta, com o
    comando para resolver. Programa do sistema só se instala com o "sim" da pessoa
    (`bash <checkout>/setup --skills <nome> --sim`).
@@ -18,7 +19,7 @@ description: Atualiza as skills do repositório HuellintonMota/claude-skills (gi
    estava na última versão.
 6. Se o setup listar skills novas não instaladas, mostre-as e pergunte quais instalar; instale com
    `bash <checkout>/setup --skills a,b`.
-7. Lembre que skills novas só aparecem numa sessão nova do Claude Code.
+7. Lembre que skills novas só aparecem numa sessão nova do agente.
 
 ## Atualização automática e adiamento
 

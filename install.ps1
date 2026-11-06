@@ -3,8 +3,11 @@
 #   irm https://raw.githubusercontent.com/HuellintonMota/claude-skills/main/install.ps1 | iex
 #
 # Ou, com opções, de um clone ou do arquivo baixado:
-#   powershell -ExecutionPolicy Bypass -File install.ps1 [-Todas] [-Skills a,b] [-Sim]
-#              [-AutoAtualizar] [-SemAutoAtualizar] [-Destino C:\caminho]
+#   powershell -ExecutionPolicy Bypass -File install.ps1 [-Agente claude,codex] [-Todas] [-Skills a,b]
+#              [-Sim] [-AutoAtualizar] [-SemAutoAtualizar] [-Destino C:\caminho]
+#
+# -Agente escolhe em quais agentes instalar (claude, codex, gemini, antigravity, cursor, opencode,
+# copilot, kiro, factory, ou auto para todos os detectados). Sem ele, o setup pergunta.
 #
 # Clona (ou atualiza) o repositório e roda o setup com o bash do Git for Windows: o setup e os
 # dependencias.sh das skills são bash, e o Claude Code no Windows já depende do Git Bash.
@@ -14,6 +17,7 @@
 
 function Install-ClaudeSkills {
     param(
+        [string]$Agente,
         [switch]$Todas,
         [string]$Skills,
         [switch]$Sim,
@@ -52,6 +56,7 @@ function Install-ClaudeSkills {
     if (-not $bash) { throw 'Falta o bash do Git for Windows (Git\bin\bash.exe).' }
 
     $opcoes = @()
+    if ($Agente) { $opcoes += @('--agente', $Agente) }
     if ($Todas) { $opcoes += '--todas' }
     if ($Skills) { $opcoes += @('--skills', $Skills) }
     if ($Sim) { $opcoes += '--sim' }
