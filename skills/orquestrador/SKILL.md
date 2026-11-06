@@ -168,11 +168,13 @@ Leia `references/delegacao.md` agora.
 1. **Maestro.** Rode `maestri floor list`. Se responder "not the Maestro", peça
    ao usuário para ligar o Maestro Mode neste terminal e pare — sem isso não dá
    para recrutar nem enxergar outros andares. Em erros de conexão, `maestri debug`.
-2. **Andares.** Confira se existem `Helpdesk`, `Conecta` e `Portal-Parceiros`.
+2. **Andares.** Confira se existem `Helpdesk`, `Conecta`, `Portal-Parceiros` e
+   `Indica-Eixo`.
    Não crie andares; se faltar o do principal, avise e pare. Os andares são
    fixos: nunca rode `floor land` ou `floor delete` neles.
 3. **Agentes.** `maestri list`. Cada andar já tem um agente fixo do projeto
-   principal (`Global Helpdesk`, `Global Conecta`, `Global Parceiros` — ver
+   principal (`Global Helpdesk`, `Global Conecta`, `Global Parceiros`,
+   `Global Indica` — ver
    `projetos.md`); use-o para aquele projeto. Para os demais projetos do card,
    procure no andar um agente com o role `Projeto: <projeto>`. Reuse sempre
    que existir — recrutar duplicado custa um terminal e uma sessão de modelo ao

@@ -41,13 +41,14 @@ com a escolha do usuário.
 Arquivos de contexto por projeto: helpdesk-web → `CLAUDE.md`, `AGENTS.md`,
 `.claude/rules/` da área e `handoff/STYLE-GUIDE.md`; bruning-rh → `CLAUDE.md`,
 `AGENTS.md`, `DESIGN.md`; bruning-parceiro → `CLAUDE.md`, `AGENTS.md`,
-`DESIGN.md`; nexus → `README.md` + `CLAUDE.md` do módulo afetado; n8n →
+`DESIGN.md`; indica-eixo → `CLAUDE.md`, `AGENTS.md`, `README.md`; nexus → `README.md` + `CLAUDE.md` do módulo afetado; n8n →
 `README.md` + `PLANO.md` do workflow, se houver.
 
 ## Briefing para agente sem role
 
 Os agentes fixos dos andares (`Global Helpdesk`, `Global Conecta`,
-`Global Parceiros`) não têm role e começam em `C:\BruningSistemas_dev`. No
+`Global Parceiros`, `Global Indica`) não têm role. Os três primeiros começam
+em `C:\BruningSistemas_dev`; o `Global Indica` já começa no repositório. No
 primeiro prompt de cada card para um deles, coloque antes de tudo:
 
 ```

@@ -26,6 +26,7 @@ label nova), corrija este arquivo — é o único lugar onde isso mora.
    | `[Helpdesk]` | `helpdesk` | helpdesk-web |
    | `[Conecta]` | `conecta` | bruning-rh (Conecta é o nome do produto) |
    | `[Portal Parceiros]` | `portal-parceiro` / `portal-parceiros` | bruning-parceiro |
+   | `[Indica Eixo]` | `indica-eixo` | indica-eixo (ainda não visto; vale se aparecer) |
    | `[Nexus]` | `nexus` | nexus (ainda não visto; vale se aparecer) |
    | `[n8n]` | `n8n` | n8n (ainda não visto; vale se aparecer) |
 
@@ -79,7 +80,8 @@ pedir). Os nomes estão em cada projeto abaixo; passe-os no briefing.
   portal no app, ou deixe o teste de tela com o Global do andar.
 - Portas de dev, uma por projeto, para os três subirem juntos: bruning-rh
   com o Nuxt em 3000 e a API em 8000 (`API_URI` do `frontend/.env`);
-  helpdesk-web em **8010** e bruning-parceiro em **8020** (`SERVER_PORT` no
+  helpdesk-web em **8010**, bruning-parceiro em **8020** e indica-eixo em
+  **8030** (`SERVER_PORT` no
   `.env` de cada um, que o `php artisan serve` lê). Se um agente subir o
   servidor com `--port` fixo ou achar outra coisa na porta, ele deve avisar,
   não trocar de porta por conta própria — o portal aponta para essa.
@@ -125,6 +127,20 @@ pedir). Os nomes estão em cada projeto abaixo; passe-os no briefing.
 - **Contexto:** `CLAUDE.md` (longo e detalhado), `AGENTS.md`, `DESIGN.md`.
 - **Palavras:** parceiro, revenda, clientes do parceiro, plano web, tenant Eixo, cliente híbrido, churn, inativação, reativados, cupom, meta semanal, crédito, mural, Downloads & Links, lembretes, sino, WhatsApp cross-sell, contratação, cobrança, gerente de contas, comissão, extrato financeiro, "Meus chamados".
 - **Relações:** SSO com o BruningDesk e com o helpdesk-web (embute o CRM dele); cria tenant na API do Eixo; avisa no Discord.
+
+## indica-eixo (Indica Eixo)
+- **Caminho:** `C:\BruningSistemas_dev\indica-eixo` (monorepo Laravel + Inertia, sem API separada)
+- **Andar:** `Indica-Eixo` — agente fixo `Global Indica` (roda direto no repositório)
+- **Navegadores:** `Indica Dev` (http://localhost:8030). Ainda não há produção.
+- **Stack:** Laravel 13 + Inertia v3 + Vue 3 + Tailwind v4 + Vite 8; MySQL também nos testes (`indicacao_marketing` / `indicacao_marketing_test`, nada de SQLite); Laravel Boost como MCP (`.mcp.json`).
+- **Branch base:** `main` (a `indica-eixo` remota está no mesmo commit). Branches `feat/PI-n-slug` / `fix/PI-n-slug`.
+- **Publicação:** ainda não há deploy (sem Actions nem servidor). Opções: **só o PR** ou **merge**. Quando houver produção, atualize aqui.
+- **Fluxo:** padrão. Formatação com Pint; testes com `composer test`.
+- **Dev:** `php artisan serve --port=8030` com os assets do build (não precisa do Vite). Usuários do seed: `admin@`, `marketing@`, `sucesso@`, `comercial@`, `financeiro@` e `demo@indicacao.test` (cliente). O Boost só sobe depois de existirem `vendor/` e `.env`; se a sessão abriu antes, reconecte pelo `/mcp`.
+- **Contexto:** `CLAUDE.md`, `AGENTS.md`, `README.md` (regras de negócio) e as skills em `.claude/skills/`.
+- **Palavras:** Indica Eixo, indicar empresa/oficina, indicação de cliente, contador ou parceiro, campanha de indicação, recompensa, PIX de indicação, desconto na mensalidade, funil de indicação, regulamento, CAC/MRR das indicações.
+- **Cuidado:** "indicações" no Conecta (bruning-rh) é a indicação de candidatos pelos colaboradores, outro sistema. Indicação de **empresa/cliente com recompensa** é aqui.
+- **Relações:** nenhuma integração ainda.
 
 ## nexus (complementar)
 - **Caminho:** `C:\BruningSistemas_dev\nexus` (monorepo Python/Flask)
