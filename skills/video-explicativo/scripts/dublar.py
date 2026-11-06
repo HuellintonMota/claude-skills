@@ -1,12 +1,13 @@
 """Dubla um vídeo que já tem legenda e não tem áudio: narra cada fala da legenda com edge-tts no tempo dela.
 
 Uso:
-  python dublar.py VIDEO [--legenda X.srt] [--voz pt-BR-ThalitaMultilingualNeural]
+  python dublar.py VIDEO [--legenda X.srt] [--voz NOME] [--velocidade +10%] [--tom -2Hz]
                    [--pronuncia pronuncia.json] [--saida X-dublado.mp4] [--ffmpeg CAMINHO]
                    [--acelerar-max 30] [--so-relatorio]
 
 Sem --legenda, procura um .srt com o mesmo nome do vídeo e, se não houver, a primeira faixa de legenda
-embutida. Legenda só queimada na imagem não é lida aqui: monte o .srt antes (references/dublagem.md).
+embutida. Voz, velocidade e tom vêm da configuração salva (`voz.py definir`); as opções só valem para
+esta execução. Legenda só queimada na imagem não é lida aqui: monte o .srt antes (references/dublagem.md).
 Requer edge-tts e ffmpeg: o setup do repositório instala os dois no .venv da skill (imageio-ffmpeg).
 """
 import argparse
@@ -25,6 +26,8 @@ from dataclasses import dataclass
 from pathlib import Path
 
 import edge_tts
+
+from voz import carregar, normalizar, somar_velocidade
 
 TAXA = 24000
 # Legendas costumam quebrar uma frase em vários blocos; narrar bloco a bloco deixa a entonação picotada.
@@ -153,13 +156,13 @@ def so_letras(texto: str) -> str:
     return "".join(ch for ch in texto.lower() if ch.isalnum())
 
 
-async def sintetizar(texto: str, voz: str, acelerar: int, mp3: Path) -> None:
-    taxa = f"+{acelerar}%" if acelerar else "+0%"
+async def sintetizar(texto: str, voz: dict, acelerar: int, mp3: Path) -> None:
+    taxa = somar_velocidade(voz["velocidade"], acelerar)
     ultima = so_letras(texto.split()[-1])
     for tentativa in range(1, 4):
         audio = bytearray()
         palavras = []
-        async for parte in edge_tts.Communicate(texto, voz, rate=taxa, boundary="WordBoundary").stream():
+        async for parte in edge_tts.Communicate(texto, voz["voz"], rate=taxa, pitch=voz["tom"], boundary="WordBoundary").stream():
             if parte["type"] == "audio":
                 audio.extend(parte["data"])
             elif parte["type"] == "WordBoundary":
@@ -188,7 +191,9 @@ async def main() -> None:
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("video")
     p.add_argument("--legenda")
-    p.add_argument("--voz", default="pt-BR-ThalitaMultilingualNeural")
+    p.add_argument("--voz", help="padrão: a voz da configuração salva")
+    p.add_argument("--velocidade", help="ex.: +10%%; padrão: a da configuração salva")
+    p.add_argument("--tom", help="ex.: -2Hz; padrão: o da configuração salva")
     p.add_argument("--pronuncia", help="JSON {\"escrito\": \"falado\"} para siglas e nomes que a voz erra")
     p.add_argument("--saida")
     p.add_argument("--ffmpeg")
@@ -196,6 +201,13 @@ async def main() -> None:
     p.add_argument("--so-relatorio", action="store_true", help="gera e mede as falas, sem montar o vídeo")
     args = p.parse_args()
     sys.stdout.reconfigure(encoding="utf-8")
+    voz = carregar()
+    try:
+        voz.update({k: v for k, v in (("voz", args.voz),
+                                      ("velocidade", args.velocidade and normalizar("velocidade", args.velocidade)),
+                                      ("tom", args.tom and normalizar("tom", args.tom))) if v})
+    except ValueError as erro:
+        sys.exit(f"Erro: {erro}")
 
     ffmpeg = achar_ffmpeg(args.ffmpeg)
     video = Path(args.video).resolve()
@@ -219,12 +231,12 @@ async def main() -> None:
         for i, f in enumerate(falas, 1):
             texto = texto_falado(f.texto, pronuncia)
             mp3 = pasta / f"f{i:03}.mp3"
-            await sintetizar(texto, args.voz, 0, mp3)
+            await sintetizar(texto, voz, 0, mp3)
             som = decodificar(ffmpeg, mp3)
             espaco = f.limite - f.inicio
             if len(som) / TAXA > espaco + TOLERANCIA_SEM_ACELERAR and espaco > 0:
                 acelerar = min(args.acelerar_max, math.ceil((len(som) / TAXA / espaco - 1) * 100) + 2)
-                await sintetizar(texto, args.voz, acelerar, mp3)
+                await sintetizar(texto, voz, acelerar, mp3)
                 som = decodificar(ffmpeg, mp3)
                 aceleradas.append((i, acelerar))
             inicio = max(f.inicio, fim_anterior + FOLGA_ENTRE_FALAS)
@@ -239,7 +251,7 @@ async def main() -> None:
             fim_anterior = inicio + len(som) / TAXA
             print(f"fala {i:3}/{len(falas)}  {f.inicio:7.2f}s  {len(som) / TAXA:5.2f}s de voz em {espaco:5.2f}s  {f.texto[:60]}")
 
-        print(f"\n{len(falas)} falas, voz {args.voz}.")
+        print(f"\n{len(falas)} falas, voz {voz['voz']}, velocidade {voz['velocidade']}, tom {voz['tom']}.")
         if aceleradas:
             print("Aceleradas para caber: " + ", ".join(f"fala {i} (+{a}%)" for i, a in aceleradas))
         if atrasadas:

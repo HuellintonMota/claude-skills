@@ -44,6 +44,16 @@ português: para ligar dois cards use `createIssueLink` com o tipo
 `Relacionar` ("relacionado a") — `Relates` não existe e devolve 404. Outros
 tipos: `Bloquear`, `Depende`, `Duplicar`, `Clonar`.
 
+## Antes de começar: versão nova?
+
+Rode `bash "$(cd -P "<pasta desta skill>/../.." && pwd)/lib/verificar-atualizacao.sh"`. Sem saída, siga.
+Se imprimir `ATUALIZACAO_DISPONIVEL <n>` e os commits, pergunte (AskUserQuestion), mostrando os commits:
+- **Atualizar agora** (recomendado): rode o mesmo script com `atualizar` e **leia este SKILL.md de novo**
+  antes de seguir, porque ele pode ter mudado.
+- **Adiar por 1 dia**: rode com `adiar`; não pergunta mais (nem atualiza sozinho) até amanhã, e siga.
+
+Uma vez por sessão basta. Se o script falhar (sem rede, sem git), siga sem atualizar.
+
 ## Modos de entrada
 
 - **ID ou URL de card** (`PI-40`, `https://bruning.atlassian.net/browse/PI-40`):

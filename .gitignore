@@ -7,5 +7,8 @@ __pycache__/
 skills/*/exemplo-enps/remotion/public/audio/
 skills/*/exemplo-enps/remotion/public/capturas/
 
+# Voz, velocidade e tom escolhidos em /video-explicativo configurar: preferência de cada máquina
+skills/video-explicativo/config.json
+
 # Tabela de pessoas (nome, e-mail, IDs do Jira e do Discord): fica só na máquina
 skills/orquestrador/references/discord.md

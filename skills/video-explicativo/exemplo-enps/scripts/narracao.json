@@ -1,5 +1,7 @@
 {
   "voz": "pt-BR-ThalitaMultilingualNeural",
+  "velocidade": "+0%",
+  "tom": "+0Hz",
   "cenas": [
     {
       "id": "c1",

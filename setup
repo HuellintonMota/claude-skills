@@ -8,6 +8,8 @@
 #                               skill claude-skills-atualizar, que roda sem terminal interativo)
 #      --sim                    instala dependências do sistema que faltarem sem perguntar
 #      --sem-dependencias       não confere dependências
+#      --auto-atualizar         liga a atualização automática (uma vez por dia, ao abrir o Claude Code)
+#      --sem-auto-atualizar     desliga a atualização automática
 #
 # Cada skill pode ter um dependencias.sh: confere o que ela precisa, instala sozinho o que fica dentro
 # da pasta da skill (ex.: .venv) e pergunta antes de instalar programas no sistema.
@@ -27,6 +29,7 @@ modo=perguntar
 pedidas=""
 dependencias=true
 DEP_MODO=perguntar
+auto=""
 while [ $# -gt 0 ]; do
   case "$1" in
     --todas) modo=todas ;;
@@ -34,7 +37,9 @@ while [ $# -gt 0 ]; do
     --atualizar) modo=atualizar ;;
     --sim) DEP_MODO=sim ;;
     --sem-dependencias) dependencias=false ;;
-    -h|--help) sed -n '2,14p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+    --auto-atualizar) auto=ligar ;;
+    --sem-auto-atualizar) auto=desligar ;;
+    -h|--help) sed -n '2,15p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
     *) echo "Opção desconhecida: $1" >&2; exit 1 ;;
   esac
   shift
@@ -136,6 +141,27 @@ if $dependencias; then
     echo "Faltam $DEP_PENDENTES dependência(s) (✗ acima). Resolva e rode o setup de novo para conferir."
   else
     echo "  tudo certo"
+  fi
+fi
+# A atualização automática é um hook SessionStart no settings.json do Claude Code; quem edita o JSON é
+# um script Python, para não reescrever à mão um arquivo que tem outras configurações da pessoa.
+SETTINGS="${CLAUDE_CONFIG_DIR:-$HOME/.claude}/settings.json"
+HOOK="bash \"$RAIZ/lib/auto-atualizar.sh\""
+python_ok=""
+for p in python3 python py; do
+  if command -v "$p" >/dev/null 2>&1 && "$p" -c "import json" >/dev/null 2>&1; then python_ok="$p"; break; fi
+done
+registrar() { "$python_ok" "$RAIZ/lib/registrar_hook.py" "$1" "$SETTINGS" "$HOOK"; }
+if [ -z "$auto" ] && [ "$modo" = perguntar ] && [ -n "$python_ok" ] && [ "$(registrar estado)" = desligado ]; then
+  read -r -p "Atualizar as skills sozinho, uma vez por dia, ao abrir o Claude Code? [S/n] " r
+  case "$r" in n|N|nao|não) ;; *) auto=ligar ;; esac
+fi
+if [ -n "$auto" ]; then
+  if [ -z "$python_ok" ]; then
+    echo "Atualização automática: precisa de Python para editar $SETTINGS. Sem ele, adicione à mão um hook"
+    echo "  SessionStart com o comando: $HOOK"
+  else
+    echo "Atualização automática: $(registrar "$auto") ($SETTINGS)"
   fi
 fi
 if [ "$modo" = atualizar ] && [ ${#novas[@]} -gt 0 ]; then

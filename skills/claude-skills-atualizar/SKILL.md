@@ -19,3 +19,17 @@ description: Atualiza as skills do repositório HuellintonMota/claude-skills (gi
 6. Se o setup listar skills novas não instaladas, mostre-as e pergunte quais instalar; instale com
    `bash <checkout>/setup --skills a,b`.
 7. Lembre que skills novas só aparecem numa sessão nova do Claude Code.
+
+## Atualização automática e adiamento
+
+Se pedirem para as skills se atualizarem sozinhas (ou para parar), rode
+`bash <checkout>/setup --atualizar --auto-atualizar` (ou `--sem-auto-atualizar`). Isso liga ou
+desliga um hook `SessionStart` no `settings.json` do Claude Code, que roda `lib/auto-atualizar.sh` uma
+vez por dia. Quando ele atualiza, a sessão recebe uma mensagem "claude-skills atualizadas
+automaticamente" com os commits: conte à pessoa o que mudou e, se aparecerem skills novas não
+instaladas, ofereça instalar.
+
+As outras skills conferem se há versão nova antes de começar (`lib/verificar-atualizacao.sh`) e
+oferecem "Atualizar agora" ou "Adiar por 1 dia". O adiamento fica em `.git/adiar-atualizacao-ate` e
+também segura a atualização automática; esta skill (pedido explícito) atualiza mesmo adiada e apaga o
+adiamento: `rm -f <checkout>/.git/adiar-atualizacao-ate`.

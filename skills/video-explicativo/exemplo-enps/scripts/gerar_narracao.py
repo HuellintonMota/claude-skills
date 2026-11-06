@@ -2,7 +2,8 @@
 
 Uso: python gerar_narracao.py [id_cena ...]   (sem argumentos, gera todas)
 O texto falado é a legenda com os números por extenso (scripts/fala.ts) e as trocas de "pronuncia",
-para a legenda continuar escrita com algarismos. Se o edge-tts falhar, o script para com erro: não há voz reserva.
+para a legenda continuar escrita com algarismos. Voz, velocidade e tom vêm do narracao.json, copiados
+da configuração da skill quando o projeto é criado, para o vídeo sair igual se for refeito em outra máquina. Se o edge-tts falhar, o script para com erro: não há voz reserva.
 """
 import asyncio
 import json
@@ -33,7 +34,8 @@ def so_letras(texto: str) -> str:
 
 
 async def falar(texto: str) -> tuple[bytes, list[dict]]:
-    comunicador = edge_tts.Communicate(texto, ROTEIRO["voz"], boundary="WordBoundary")
+    comunicador = edge_tts.Communicate(texto, ROTEIRO["voz"], rate=ROTEIRO.get("velocidade", "+0%"),
+                                       pitch=ROTEIRO.get("tom", "+0Hz"), boundary="WordBoundary")
     palavras = []
     audio = bytearray()
     async for parte in comunicador.stream():

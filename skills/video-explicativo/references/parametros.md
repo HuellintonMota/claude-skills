@@ -1,7 +1,9 @@
 # Parâmetros do padrão (vídeo do eNPS, 03/11/2026)
 
 ## Voz
-- edge-tts `pt-BR-ThalitaMultilingualNeural` (feminina), velocidade e tom padrão (sem `rate`/`pitch`).
+- edge-tts `pt-BR-ThalitaMultilingualNeural` (feminina), velocidade e tom padrão (`+0%` e `+0Hz`).
+  Cada máquina pode trocar com `/video-explicativo configurar` (`config.json` na pasta da skill, fora
+  do git); o projeto de cada vídeo grava a voz, a velocidade e o tom no `narracao.json`.
 - Narração gerada com `boundary="WordBoundary"`; o tempo de cada palavra vai para `tempos.json`.
 - A Thalita é multilíngue e às vezes lê algarismos em espanhol: a **fala** leva números por extenso
   ("60%" → "sessenta por cento", "-100" → "menos cem"); a **legenda** mantém os algarismos. Uma função só
