@@ -1,0 +1,78 @@
+name: Problema
+description: Algo não funciona como deveria em uma skill ou na instalação.
+title: "[Problema] "
+labels: ["problema"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Não coloque senha, token, URL de webhook nem dados pessoais aqui: o repositório é público. Se colar um log, apague esses dados antes.
+  - type: dropdown
+    id: skill
+    attributes:
+      label: Skill
+      options:
+        - video-explicativo
+        - orquestrador
+        - claude-skills-atualizar
+        - setup/instalação
+        - outra
+    validations:
+      required: true
+  - type: input
+    id: versao
+    attributes:
+      label: Versão
+      description: A saída de `bash ~/.claude/claude-skills/setup --versao`.
+      placeholder: "0.5.0"
+    validations:
+      required: true
+  - type: dropdown
+    id: agente
+    attributes:
+      label: Agente
+      options:
+        - Claude Code
+        - Codex CLI
+        - Gemini CLI
+        - Antigravity
+        - Cursor
+        - OpenCode
+        - GitHub Copilot CLI
+        - Kiro
+        - Factory Droid
+        - outro
+    validations:
+      required: true
+  - type: input
+    id: sistema
+    attributes:
+      label: Sistema
+      description: Windows (Git Bash ou PowerShell), macOS ou Linux.
+      placeholder: "Windows 11, Git Bash"
+    validations:
+      required: true
+  - type: textarea
+    id: aconteceu
+    attributes:
+      label: O que aconteceu
+      description: Inclua a mensagem de erro, se houver.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduzir
+    attributes:
+      label: Como reproduzir
+      description: Os passos ou o pedido feito ao agente.
+      placeholder: |
+        1.
+        2.
+        3.
+    validations:
+      required: true
+  - type: textarea
+    id: esperado
+    attributes:
+      label: O que você esperava
+    validations:
+      required: true

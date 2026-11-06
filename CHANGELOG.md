@@ -5,6 +5,8 @@ que quebra a instalação ou o uso, Y traz recurso novo e Z é correção.
 
 ## [Não lançado]
 
+- Pedidos de melhoria e relatos de problema passam a ser por issue, com formulários próprios.
+
 ## [0.5.0] - 2026-11-06
 
 - No terminal, o setup mostra caixas de seleção para escolher agentes e skills: setas movem, Espaço

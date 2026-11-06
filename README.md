@@ -238,6 +238,13 @@ Z é correção. Enquanto a versão não sai, cada mudança entra em "[Não lan�
 - **"atualização automática pulada, há alterações locais"**: alguém editou arquivos no checkout. Veja
   com `git -C ~/.claude/claude-skills status` e resolva antes de atualizar.
 
+## Pedir melhoria ou relatar problema
+
+Abra uma issue: [nova issue](https://github.com/HuellintonMota/claude-skills/issues/new/choose). Há
+dois formulários, **Melhoria em uma skill** e **Problema**. As que já existem estão em
+[issues](https://github.com/HuellintonMota/claude-skills/issues). Pull request só depois de combinar
+na issue, e só entra com a aprovação do mantenedor. Veja o [CONTRIBUTING](CONTRIBUTING.md).
+
 ## Dependências
 
 O `setup` confere o que cada skill precisa (`skills/<nome>/dependencias.sh`) depois de ligá-la:

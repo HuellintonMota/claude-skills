@@ -1,0 +1,42 @@
+name: Melhoria em uma skill
+description: Peça algo novo ou diferente em uma das skills ou na instalação.
+title: "[Melhoria] "
+labels: ["melhoria"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Obrigado pela ideia. Não coloque senha, token, URL de webhook nem dados pessoais aqui: o repositório é público.
+  - type: dropdown
+    id: skill
+    attributes:
+      label: Skill
+      options:
+        - video-explicativo
+        - orquestrador
+        - claude-skills-atualizar
+        - setup/instalação
+        - outra
+    validations:
+      required: true
+  - type: textarea
+    id: o-que
+    attributes:
+      label: O que você quer
+      description: Descreva a melhoria como quem usa a skill.
+    validations:
+      required: true
+  - type: textarea
+    id: por-que
+    attributes:
+      label: Por quê
+      description: Que problema isso resolve ou que tempo economiza?
+    validations:
+      required: true
+  - type: textarea
+    id: exemplo
+    attributes:
+      label: Exemplo
+      description: Um caso real, o pedido que você faria ao agente ou como imagina o resultado.
+    validations:
+      required: false
