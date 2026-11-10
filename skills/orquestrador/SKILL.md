@@ -428,7 +428,17 @@ Com todos os relatórios em mãos (e o resultado da Etapa 8):
    depois, por uma publicação que tinha ficado só no PR.
 5. Marque as notas como `Concluído` e atualize o status do Ground. Não apague
    as notas: elas ficam no fichário como histórico do card, e só saem se o
-   usuário pedir.
+   usuário pedir (ver o passo 6).
+6. **Limpar o canvas.** Com o card fechado (`Concluído`, ou merge de tarefa sem card),
+   pergunte com AskUserQuestion se pode:
+   - limpar o contexto dos terminais que trabalharam no card e não têm outra tarefa aberta:
+     `maestri ask "<agente>" --raw '/clear\n'`. No Git Bash, rode com `MSYS_NO_PATHCONV=1`,
+     senão o `/clear` vira um caminho do Windows. Se houver texto na caixa do agente, mande
+     `\x15` antes. Nunca limpe o Executor nem o Git Manager;
+   - apagar o fichário do card no Ground (`maestri note delete --stack "<ID>"`).
+
+   O "sim" é o pedido explícito que a salvaguarda das notas exige. Card em `AG. Versão`
+   mantém as notas até a publicação.
 
 ## Formato do --simular
 

@@ -5,7 +5,10 @@ que quebra a instalação ou o uso, Y traz recurso novo e Z é correção.
 
 ## [Não lançado]
 
+## [0.6.0] - 2026-11-10
+
 - Pedidos de melhoria e relatos de problema passam a ser por issue, com formulários próprios.
+- orquestrador: ao fechar o card, pergunta se pode limpar o contexto dos terminais usados e apagar o fichário do card no Ground.
 
 ## [0.5.0] - 2026-11-06
 
